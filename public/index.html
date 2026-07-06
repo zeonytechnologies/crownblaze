@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrownBeatz DJ Night - Premium Ticket Booking</title>
+  <meta name="description" content="Book tickets for the ultimate CrownBeatz DJ Night. Experience a premium EDM music festival with state-of-the-art visual effects and sound system.">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Glowing Orbs -->
+  <div class="bg-glow-container">
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+    <div class="music-visualizer">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <!-- Floating Notes -->
+    <div class="floating-notes">
+      <i class="fa-solid fa-music note note-1"></i>
+      <i class="fa-solid fa-music note note-2"></i>
+      <i class="fa-solid fa-music note note-3"></i>
+      <i class="fa-solid fa-compact-disc note note-4"></i>
+      <i class="fa-solid fa-headphones note note-5"></i>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-container">
+      <a href="#" class="logo">CROWN<span>BEATZ</span></a>
+      <a href="#booking" class="btn-secondary">Book Tickets</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero container">
+    <div class="hero-tagline">The Ultimate Music Experience</div>
+    <h1 class="hero-title">CrownBeatz DJ Night</h1>
+    <p style="color: var(--color-text-secondary); max-width: 600px; margin: 0 auto 30px;">
+      Join us for an electrifying night of heavy bass, custom lasers, and non-stop party anthems. The premium clubbing event of the year.
+    </p>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-container" id="countdown">
+      <div class="countdown-box">
+        <span class="countdown-value" id="days">00</span>
+        <span class="countdown-label">Days</span>
+      </div>
+      <div class="countdown-box">
+        <span class="countdown-value" id="hours">00</span>
+        <span class="countdown-label">Hours</span>
+      </div>
+      <div class="countdown-box">
+        <span class="countdown-value" id="minutes">00</span>
+        <span class="countdown-label">Mins</span>
+      </div>
+      <div class="countdown-box">
+        <span class="countdown-value" id="seconds">00</span>
+        <span class="countdown-label">Secs</span>
+      </div>
+    </div>
+
+    <a href="#booking" class="btn-glow">Book Now</a>
+
+    <!-- Big DJ Festival Banner -->
+    <div class="hero-banner-container">
+      <div class="hero-banner-image"></div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">About the Night</h2>
+      <div class="grid-about">
+        <div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 20px; color: var(--color-neon-blue);">A Symphony of Lights & Sound</h3>
+          <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
+            Get ready to experience high-octane live DJ performances, pounding EDM tracks, custom Bollywood Mashups, and commercial hits that will keep you dancing all night. We are pulling out all the stops to deliver a festival-scale sound system, custom laser configurations, smoke effects, and a high-energy dance floor atmosphere.
+          </p>
+          <div class="about-features">
+            <div class="feature-tag"><i class="fa-solid fa-volume-high"></i> Premium Sound System</div>
+            <div class="feature-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Laser & Smoke FX</div>
+            <div class="feature-tag"><i class="fa-solid fa-users"></i> High Energy Crowd</div>
+            <div class="feature-tag"><i class="fa-solid fa-champagne-glasses"></i> VIP Lounge Zone</div>
+          </div>
+        </div>
+        <div class="glass-card">
+          <h3 style="font-size: 1.4rem; margin-bottom: 16px; color: #fff;">Event Highlights</h3>
+          <ul style="list-style: none; color: var(--color-text-secondary);">
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Non-stop 6-Hour DJ Marathon
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Dedicated Photography & Selfie Zone
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Curated Food & Beverage Stalls
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Secured Entry and Free Parking
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Exclusive CrownBeatz Merchandise counter
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DJ Section -->
+  <section class="dj-section">
+    <div class="container">
+      <h2 class="section-title">Featured Artist</h2>
+      <div class="dj-grid">
+        <div class="dj-img-card">
+          <div class="dj-img"></div>
+        </div>
+        <div class="dj-details">
+          <h3>DJ HYPNOTIC</h3>
+          <div class="dj-subtitle">Master of progressive house & techno</div>
+          <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
+            Hailing from the main stages of international music festivals, DJ Hypnotic brings an explosive setlist crafted specifically for CrownBeatz. Known for blending hypnotic techno rhythms with high-intensity commercial anthems and custom sub-bass elements.
+          </p>
+          <div>
+            <span class="genre-pill">EDM</span>
+            <span class="genre-pill">Techno</span>
+            <span class="genre-pill">House</span>
+            <span class="genre-pill">Bollywood Mashups</span>
+          </div>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fa-brands fa-soundcloud"></i></a>
+            <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Music Experience Section -->
+  <section class="genres">
+    <div class="container">
+      <h2 class="section-title">Music Experience</h2>
+      <div class="genre-grid">
+        <div class="genre-card">
+          <i class="fa-solid fa-bolt genre-icon"></i>
+          <h3 class="genre-title">EDM</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Energetic festival drops & progressive anthems.</p>
+        </div>
+        <div class="genre-card">
+          <i class="fa-solid fa-wave-square genre-icon"></i>
+          <h3 class="genre-title">Techno</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Hypnotic dark beats & underground rhythms.</p>
+        </div>
+        <div class="genre-card">
+          <i class="fa-solid fa-record-vinyl genre-icon"></i>
+          <h3 class="genre-title">Bollywood Remix</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem;">High-tempo remixes of popular charts.</p>
+        </div>
+        <div class="genre-card">
+          <i class="fa-solid fa-music genre-icon"></i>
+          <h3 class="genre-title">House Music</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Smooth, vocal-rich, danceable house vibes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Event Information -->
+  <section class="info-section">
+    <div class="container">
+      <h2 class="section-title">Event Info</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-regular fa-calendar-days"></i></div>
+          <div>
+            <h3 class="info-title">Date</h3>
+            <p class="info-text">December 31, 2026</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
+          <div>
+            <h3 class="info-title">Timing</h3>
+            <p class="info-text">08:00 PM onwards</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+          <div>
+            <h3 class="info-title">Venue</h3>
+            <p class="info-text">Neon Arena, Phase 2, Bangalore</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-solid fa-ban"></i></div>
+          <div>
+            <h3 class="info-title">Rules</h3>
+            <p class="info-text">21+ Entry | Smart Casual Dresscode</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Section -->
+  <section class="booking-section" id="booking">
+    <div class="container">
+      <h2 class="section-title">Secure Your Spot</h2>
+      <div class="booking-grid">
+        
+        <!-- Booking Form -->
+        <div class="glass-card">
+          <h3 style="font-size: 1.5rem; margin-bottom: 24px; color: var(--color-neon-blue);">Attendee Details</h3>
+          <form id="booking-form" novalidate>
+            <div class="form-group">
+              <label for="full-name">Full Name</label>
+              <input type="text" id="full-name" class="form-control" placeholder="John Doe" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="email-address">Email Address</label>
+              <input type="email" id="email-address" class="form-control" placeholder="john@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="phone-number">Phone Number</label>
+              <input type="tel" id="phone-number" class="form-control" placeholder="9876543210" required>
+            </div>
+
+            <div style="margin-bottom: 24px; border: 1px solid var(--glass-border); padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.2);">
+              <label style="display:block; font-size:1rem; margin-bottom:12px; color: var(--color-neon-blue); font-weight:600;">Select Passes</label>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                  <div style="font-weight: 600;">Couples Pass</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹499 per couple</div>
+                </div>
+                <div class="quantity-control">
+                  <button type="button" class="qty-btn" id="qty-couples-minus">-</button>
+                  <span class="qty-value" id="qty-couples-val">0</span>
+                  <button type="button" class="qty-btn" id="qty-couples-plus">+</button>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                  <div style="font-weight: 600;">Adult Pass</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹299 per person</div>
+                </div>
+                <div class="quantity-control">
+                  <button type="button" class="qty-btn" id="qty-adult-minus">-</button>
+                  <span class="qty-value" id="qty-adult-val">1</span>
+                  <button type="button" class="qty-btn" id="qty-adult-plus">+</button>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600;">Child Pass</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹199 per child</div>
+                </div>
+                <div class="quantity-control">
+                  <button type="button" class="qty-btn" id="qty-child-minus">-</button>
+                  <span class="qty-value" id="qty-child-val">0</span>
+                  <button type="button" class="qty-btn" id="qty-child-plus">+</button>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-glow" style="width: 100%; margin-top: 16px;" id="btn-submit-booking">
+              Book Tickets
+            </button>
+          </form>
+        </div>
+
+        <!-- Receipt & Total Amount -->
+        <div class="glass-card">
+          <h3 style="font-size: 1.5rem; margin-bottom: 24px;">Ticket Breakdown</h3>
+          <div style="background: rgba(255, 255, 255, 0.01); padding: 20px; border-radius: 16px; border: 1px solid var(--glass-border);">
+            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">CrownBeatz VIP Entry Pass</p>
+            <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Grants full access to dance floor, general standing zone & laser visual experience.</p>
+          </div>
+
+          <div class="pricing-breakdown">
+            <div class="breakdown-row">
+              <span>Couples (₹499)</span>
+              <span>x <span id="summary-couples">0</span></span>
+            </div>
+            <div class="breakdown-row">
+              <span>Adult (₹299)</span>
+              <span>x <span id="summary-adult">1</span></span>
+            </div>
+            <div class="breakdown-row">
+              <span>Child (₹199)</span>
+              <span>x <span id="summary-child">0</span></span>
+            </div>
+            <hr style="border-color: var(--glass-border); margin: 10px 0;">
+            <div class="breakdown-row total">
+              <span>Total Amount</span>
+              <span>₹<span id="total-display">2,358.82</span></span>
+            </div>
+          </div>
+
+          <div class="badge-row">
+            <div class="secure-badge">
+              <i class="fa-solid fa-shield-halved"></i> 256-Bit SSL Secure
+            </div>
+            <div class="secure-badge">
+              <i class="fa-solid fa-credit-card"></i> Razorpay Verified
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">CROWN<span>BEATZ</span></a>
+        <p>The premium music event experience. Sound, lights, and memories that last a lifetime.</p>
+        <p><i class="fa-solid fa-envelope"></i> contact@crownbeatz.com</p>
+      </div>
+      <div class="footer-col">
+        <h4>Legal Links</h4>
+        <ul>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Refund Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect With Us</h4>
+        <div class="social-links" style="margin-top: 10px;">
+          <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CrownBeatz. All Rights Reserved. Crafted for EDM Lovers.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loader-overlay" id="loader-overlay">
+    <div class="spinner"></div>
+    <p style="font-family: var(--font-title); font-weight: 600; font-size: 1.1rem; color: var(--color-neon-blue);">Processing Secure Payment...</p>
+  </div>
+
+  <!-- Razorpay Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Frontend Logic scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/payment.js"></script>
+</body>
+</html>

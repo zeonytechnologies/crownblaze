@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - CrownBeatz</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- Background Decorative Orbs -->
+  <div class="bg-glow-container">
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+  </div>
+
+  <!-- ==================== LOGIN VIEW ==================== -->
+  <div id="login-section" class="login-wrapper">
+    <div class="glass-card login-card">
+      <h1 class="logo" style="margin-bottom: 24px;">CROWN<span>BEATZ</span></h1>
+      <h2 style="font-size: 1.4rem; margin-bottom: 30px; text-transform: uppercase;">Admin Authentication</h2>
+      
+      <form id="login-form">
+        <div class="form-group" style="text-align: left;">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Enter admin username" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter admin password" required>
+        </div>
+        
+        <button type="submit" class="btn-glow" style="width: 100%; margin-top: 16px;">
+          Log In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== DASHBOARD VIEW ==================== -->
+  <div id="dashboard-section" style="display: none;">
+    <!-- Dashboard Header -->
+    <div class="dash-header">
+      <a href="#" class="logo">CROWN<span>BEATZ</span> <span style="font-size: 0.9rem; font-family: var(--font-body); text-transform: uppercase; color: var(--color-neon-blue); letter-spacing: 1px; font-weight: normal; margin-left: 10px;">Portal</span></a>
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <a href="/admin/scanner" class="btn-secondary" style="padding: 8px 20px;"><i class="fa-solid fa-qrcode"></i> Scan Camera</a>
+        <button id="btn-logout" class="btn-secondary" style="border-color: #ff3366; color: #ff3366; padding: 8px 20px;"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="container" style="padding: 40px 24px;">
+      
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="glass-card stat-card">
+          <h3>Total Tickets</h3>
+          <span class="value" id="stat-total">0</span>
+        </div>
+        <div class="glass-card stat-card">
+          <h3>Today's Bookings</h3>
+          <span class="value" id="stat-today">0</span>
+        </div>
+        <div class="glass-card stat-card revenue">
+          <h3>Total Revenue</h3>
+          <span class="value">₹<span id="stat-revenue">0.00</span></span>
+        </div>
+        <div class="glass-card stat-card checked">
+          <h3>Checked In</h3>
+          <span class="value" id="stat-checked">0</span>
+        </div>
+        <div class="glass-card stat-card">
+          <h3>Pending</h3>
+          <span class="value" id="stat-pending">0</span>
+        </div>
+      </div>
+
+      <!-- Tickets Database Manager -->
+      <div class="glass-container" style="margin-top: 40px;">
+        <h2 style="font-family: var(--font-title); font-size: 1.6rem; margin-bottom: 24px; text-transform: uppercase;">
+          Bookings Management
+        </h2>
+        
+        <!-- Controls Panel -->
+        <div class="control-panel">
+          <input type="text" id="ticket-search" class="form-control search-input" placeholder="Search by name, phone, ticket ID, or payment ID...">
+          
+          <select id="filter-attendance" class="filter-select">
+            <option value="all">All Attendance</option>
+            <option value="true">Checked In Only</option>
+            <option value="false">Pending Only</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Qty</th>
+                <th>Amount</th>
+                <th>Attendance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-table-body">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <div style="color: var(--color-text-secondary); font-size: 0.9rem;">
+            Showing page <span id="current-page-num">1</span> of <span id="total-page-num">1</span>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="page-btn" id="btn-prev" disabled>Previous</button>
+            <button class="page-btn" id="btn-next" disabled>Next</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== TICKET DETAILS MODAL ==================== -->
+  <div class="modal-overlay" id="details-modal">
+    <div class="glass-card modal-card" style="padding: 30px;">
+      <span class="close-btn" id="btn-close-modal">&times;</span>
+      <h3 style="font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; color: var(--color-neon-blue);">Ticket Details</h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Customer Name</span>
+          <span id="modal-name" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Email Address</span>
+          <span id="modal-email" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Phone Number</span>
+          <span id="modal-phone" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Ticket ID</span>
+          <span id="modal-ticket-id" style="font-weight: 600; color: var(--color-neon-blue);">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Payment ID</span>
+          <span id="modal-payment-id" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Ticket Types</span>
+          <span id="modal-count" style="font-weight: 600; text-align: right;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Amount Paid</span>
+          <span id="modal-amount" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Booking Date</span>
+          <span id="modal-date" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Attendance Status</span>
+          <span id="modal-attendance" style="font-weight: 600;">-</span>
+        </div>
+      </div>
+
+      <!-- QR Preview -->
+      <div style="text-align: center; background: #fff; padding: 12px; border-radius: 12px; max-width: 140px; margin: 0 auto 20px;">
+        <img id="modal-qr-img" src="" alt="QR" style="width: 100%; height: auto; object-fit: contain;">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-modal-toggle-attendance" class="btn-glow" style="width: 100%;">Toggle Check-in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JS Code Scripts -->
+  <script src="/js/admin.js"></script>
+</body>
+</html>

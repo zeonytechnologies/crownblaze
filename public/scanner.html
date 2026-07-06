@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Scanner - CrownBeatz Admin</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .scanner-container {
+      max-width: 600px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    #reader {
+      width: 100%;
+      background: #000;
+      border: 2px solid var(--color-purple);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(123, 44, 191, 0.2);
+    }
+    #reader__scan_region {
+      background: #000;
+    }
+    #reader button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-neon-blue) 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 10px;
+      transition: var(--transition);
+    }
+    #reader select {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      border-radius: 8px;
+      outline: none;
+      margin: 10px;
+    }
+    #reader select option {
+      background: var(--bg-secondary);
+      color: #fff;
+    }
+    .scanner-modal-card {
+      max-width: 500px;
+      width: 90%;
+      border-radius: 24px;
+      text-align: center;
+      padding: 30px;
+      border-width: 2px;
+    }
+    .status-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+    .status-valid { border-color: #00ff66; box-shadow: 0 10px 35px rgba(0, 255, 102, 0.25); }
+    .status-warning { border-color: #ffaa00; box-shadow: 0 10px 35px rgba(255, 170, 0, 0.25); }
+    .status-invalid { border-color: #ff3366; box-shadow: 0 10px 35px rgba(255, 51, 102, 0.25); }
+  </style>
+</head>
+<body>
+
+  <!-- Background Glowing Orbs -->
+  <div class="bg-glow-container">
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-container">
+      <a href="/admin" class="logo">CROWN<span>BEATZ</span> <span style="font-size: 0.9rem; font-family: var(--font-body); text-transform: uppercase; color: var(--color-neon-blue); letter-spacing: 1px; font-weight: normal; margin-left: 10px;">Scanner</span></a>
+      <a href="/admin" class="btn-secondary" style="padding: 8px 20px;"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </div>
+  </header>
+
+  <div class="container scanner-container">
+    <div class="glass-card" style="padding: 30px;">
+      <h2 style="font-family: var(--font-title); font-size: 1.6rem; margin-bottom: 8px; text-transform: uppercase; color: var(--color-neon-blue);">
+        Live Entrance Check-in
+      </h2>
+      <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
+        Scan attendee's ticket QR code using your device camera to check them in.
+      </p>
+
+      <!-- HTML5 QR Scanner Anchor -->
+      <div id="reader"></div>
+
+      <!-- Quick Scan Input box fallback -->
+      <div style="margin-top: 24px; display: flex; gap: 10px;">
+        <input type="text" id="manual-scan-input" class="form-control" placeholder="Enter Ticket ID manually (e.g. CB-2026-000001)">
+        <button id="btn-manual-verify" class="btn-glow" style="padding: 12px 24px;">Verify</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VERIFICATION RESULT MODAL ==================== -->
+  <div class="modal-overlay" id="result-modal">
+    <div id="result-card" class="glass-card scanner-modal-card">
+      <div id="result-icon" class="status-icon"></div>
+      <h2 id="result-title" style="font-family: var(--font-title); font-size: 1.8rem; margin-bottom: 12px; text-transform: uppercase;">VALID TICKET</h2>
+      <p id="result-message" style="color: var(--color-text-secondary); margin-bottom: 24px; font-size: 1.05rem; font-weight: 500;">
+        Successfully Checked In.
+      </p>
+
+      <!-- Details List -->
+      <div id="result-details" style="display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 24px; background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border);">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Attendee</span>
+          <span id="res-name" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Ticket ID</span>
+          <span id="res-ticket-id" style="font-weight: 600; color: var(--color-neon-blue);">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Tickets Booked</span>
+          <span id="res-count" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Booking Time</span>
+          <span id="res-time" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 8px;">
+          <span style="color: var(--color-text-secondary);">Scan/Check-in Time</span>
+          <span id="res-scan-time" style="font-weight: 600; color: #fff;">-</span>
+        </div>
+      </div>
+
+      <button id="btn-close-result" class="btn-glow" style="width: 100%;">Scan Next</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- HTML5 QR Code Library -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- Scanner Handler Logic -->
+  <script src="/js/scanner.js"></script>
+</body>
+</html>
