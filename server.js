@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
+app.set('trust proxy', 1); // Required for secure URLs on platforms like Render
 const PORT = process.env.PORT || 3000;
 
 // Security Middlewares

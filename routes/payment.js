@@ -126,13 +126,8 @@ router.post('/verify', async (req, res) => {
     const ticketsNum = (countCouples * 2) + countAdult + countChild; // Couples = 2 persons
     const totalAmount = (countCouples * PRICE_COUPLES) + (countAdult * PRICE_ADULT) + (countChild * PRICE_CHILD);
 
-    // Build the verify URL that scanner.js will ping
-    const host = req.get('host');
-    const protocol = req.protocol;
-    const verifyUrl = `${protocol}://${host}/api/admin/verify/${ticketId}`;
-    
-    // Generate QR Code containing verification URL
-    const qrData = await generateQRCode(verifyUrl);
+    // Generate QR Code containing only the ticket ID
+    const qrData = await generateQRCode(ticketId);
 
     // Store Ticket in Supabase
     const { error: dbError } = await supabase.from('tickets').insert([{

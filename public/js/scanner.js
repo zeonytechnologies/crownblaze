@@ -127,9 +127,17 @@ btnCloseResult.addEventListener('click', () => {
 
 // Setup QR Code scanner
 const onScanSuccess = (decodedText) => {
-  // Ensure the scanned text is a valid CrownBeatz verification URL
-  if (decodedText.includes('/api/admin/verify/')) {
-    verifyTicket(decodedText);
+  let verifyUrl = decodedText.trim();
+  
+  // Backward compatibility: If it's an old ticket with a full URL, extract just the ticket ID
+  if (verifyUrl.includes('/api/admin/verify/')) {
+    const parts = verifyUrl.split('/api/admin/verify/');
+    const ticketId = parts[1];
+    verifyUrl = `/api/admin/verify/${ticketId}`;
+  } 
+  // If it's a new ticket with just the ID
+  else if (verifyUrl.startsWith('CB-')) {
+    verifyUrl = `/api/admin/verify/${verifyUrl}`;
   } else {
     // Scanned something else, show invalid ticket schema
     displayScanResult({
@@ -137,7 +145,10 @@ const onScanSuccess = (decodedText) => {
       status: 'INVALID',
       message: '❌ Invalid QR Code format. Not a CrownBeatz ticket.'
     });
+    return;
   }
+  
+  verifyTicket(verifyUrl);
 };
 
 const initScanner = () => {
