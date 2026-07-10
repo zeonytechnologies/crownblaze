@@ -142,9 +142,17 @@
           <span style="color: var(--color-text-secondary);">Scan/Check-in Time</span>
           <span id="res-scan-time" style="font-weight: 600; color: #fff;">-</span>
         </div>
-      </div>
 
-      <button id="btn-close-result" class="btn-glow" style="width: 100%;">Scan Next</button>
+        <!-- Partial Check-in Selection -->
+        <div id="checkin-selection-container" style="display: none; margin-top: 16px; border-top: 1px solid var(--glass-border); padding-top: 16px; text-align: left;">
+          <h4 style="margin-bottom: 12px; color: var(--color-neon-blue); font-size: 0.9rem;">Select arriving guests:</h4>
+          <div id="checkin-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+            <!-- Checkboxes dynamically generated here -->
+          </div>
+          <button id="btn-confirm-checkin" class="btn btn-primary" style="margin-top: 16px; width: 100%; padding: 12px;">Confirm Check-In</button>
+        </div>
+
+        <button id="btn-close-result" class="btn btn-secondary" style="margin-top: 16px;">Close</button>
     </div>
   </div>
 

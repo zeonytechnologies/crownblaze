@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const { supabase } = require('../supabase/client');
 const { generateQRCode } = require('../utils/qr');
+const { sendTicketEmail } = require('../utils/mailer');
 
 const PRICE_COUPLES = 499;
 const PRICE_ADULT = 299;
@@ -150,6 +151,18 @@ router.post('/verify', async (req, res) => {
       console.error('Database Error storing ticket:', dbError);
       return res.status(500).json({ success: false, error: 'Payment verified, but booking save failed. Please contact support.' });
     }
+
+    // Send the automated ticket email
+    await sendTicketEmail({
+      name,
+      email,
+      ticketId,
+      amount: totalAmount,
+      qrData,
+      couples: countCouples,
+      adults: countAdult,
+      children: countChild
+    });
 
     res.json({
       success: true,

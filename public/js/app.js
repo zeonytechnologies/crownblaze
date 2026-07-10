@@ -81,6 +81,27 @@ const initPricingCalculator = () => {
   updatePricing();
 };
 
+// FAB Scroll Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const fab = document.getElementById('fab-book');
+  if (fab) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 600) {
+        fab.classList.add('show');
+      } else {
+        fab.classList.remove('show');
+      }
+    });
+
+    fab.addEventListener('click', () => {
+      const bookingSection = document.getElementById('booking');
+      if (bookingSection) {
+        bookingSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+});
+
 // Toast Notifications Helper
 const showToast = (message, type = 'info') => {
   const container = document.getElementById('toast-container');

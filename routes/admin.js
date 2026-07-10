@@ -272,16 +272,91 @@ router.get('/verify/:ticketId', async (req, res) => {
       return res.json({
         success: true,
         status: 'ALREADY_CHECKED_IN',
-        message: '⚠️ Already Checked In',
+        message: '⚠️ Already Checked In (Fully)',
         ticket
       });
     }
 
-    // If attendance is false, check them in
+    // Calculate remaining people
+    const couplesTotal = (ticket.couples_count || 0) * 2;
+    const adultTotal = ticket.adult_count || 0;
+    const childTotal = ticket.child_count || 0;
+
+    const remainingCouples = couplesTotal - (ticket.checked_in_couples || 0);
+    const remainingAdults = adultTotal - (ticket.checked_in_adult || 0);
+    const remainingChildren = childTotal - (ticket.checked_in_child || 0);
+
+    const isPartial = (ticket.checked_in_couples > 0 || ticket.checked_in_adult > 0 || ticket.checked_in_child > 0);
+
+    return res.json({
+      success: true,
+      status: 'PARTIAL_CHECKIN_REQUIRED',
+      message: isPartial ? '✅ Valid Ticket: Partial Check-in Pending' : '✅ VALID TICKET: Full Check-in Pending',
+      ticket,
+      remaining: {
+        couples: remainingCouples,
+        adults: remainingAdults,
+        children: remainingChildren
+      }
+    });
+
+  } catch (error) {
+    console.error('Error verifying scanned ticket:', error);
+    res.status(500).json({ success: false, error: 'Internal server error verifying ticket.' });
+  }
+});
+
+// POST: /api/admin/checkin (Perform Partial/Full Check-in)
+router.post('/checkin', async (req, res) => {
+  try {
+    const { ticketId, couples, adults, children } = req.body;
+
+    if (!ticketId) {
+      return res.status(400).json({ success: false, error: 'Ticket ID is required.' });
+    }
+
+    // Fetch the ticket
+    const { data: ticket, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .eq('ticket_id', ticketId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!ticket) {
+      return res.status(404).json({ success: false, error: 'Ticket not found.' });
+    }
+
+    const newCheckedInCouples = (ticket.checked_in_couples || 0) + (couples || 0);
+    const newCheckedInAdults = (ticket.checked_in_adult || 0) + (adults || 0);
+    const newCheckedInChildren = (ticket.checked_in_child || 0) + (children || 0);
+
+    const couplesTotal = (ticket.couples_count || 0) * 2;
+    const adultTotal = ticket.adult_count || 0;
+    const childTotal = ticket.child_count || 0;
+
+    const isFullyCheckedIn = (newCheckedInCouples >= couplesTotal) && 
+                             (newCheckedInAdults >= adultTotal) && 
+                             (newCheckedInChildren >= childTotal);
+
     const checkInTime = new Date().toISOString();
+
+    const updatePayload = {
+      checked_in_couples: newCheckedInCouples,
+      checked_in_adult: newCheckedInAdults,
+      checked_in_child: newCheckedInChildren,
+    };
+
+    if (isFullyCheckedIn) {
+      updatePayload.attendance = true;
+      if (!ticket.checked_in_at) {
+        updatePayload.checked_in_at = checkInTime;
+      }
+    }
+
     const { data: updatedTicket, error: updateError } = await supabase
       .from('tickets')
-      .update({ attendance: true, checked_in_at: checkInTime })
+      .update(updatePayload)
       .eq('ticket_id', ticketId)
       .select()
       .maybeSingle();
@@ -297,8 +372,7 @@ router.get('/verify/:ticketId', async (req, res) => {
 
     res.json({
       success: true,
-      status: 'VALID',
-      message: '✅ VALID TICKET: Successfully Checked In.',
+      message: isFullyCheckedIn ? 'Fully Checked In!' : 'Partial Check-in Successful!',
       ticket: updatedTicket
     });
 

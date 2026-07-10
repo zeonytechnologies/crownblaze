@@ -881,3 +881,32 @@ footer {
   color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
+
+/* Floating Action Button */
+.fab-btn {
+  position: fixed;
+  bottom: -100px;
+  right: 30px;
+  background: linear-gradient(45deg, var(--color-purple), var(--color-neon-blue));
+  color: #fff;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-family: var(--font-title);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 243, 255, 0.4);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fab-btn.show {
+  bottom: 30px;
+}
+.fab-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
+}
