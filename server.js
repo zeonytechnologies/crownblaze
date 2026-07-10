@@ -3,6 +3,7 @@ const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const https = require('https');
 require('dotenv').config();
 
 const app = express();
@@ -68,6 +69,23 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, error: 'Internal Server Error' });
 });
+
+// --- Anti-Sleep Mechanism for Render Free Tier ---
+// Create a simple ping route
+app.get('/api/ping', (req, res) => res.status(200).send('pong'));
+
+// Start the 14-minute interval if running on Render
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
+if (RENDER_EXTERNAL_URL) {
+  setInterval(() => {
+    https.get(`${RENDER_EXTERNAL_URL}/api/ping`, (res) => {
+      console.log(`[Anti-Sleep] Pinged self. Status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error(`[Anti-Sleep] Ping failed: ${err.message}`);
+    });
+  }, 14 * 60 * 1000); // 14 minutes
+}
+// --------------------------------------------------
 
 app.listen(PORT, () => {
   console.log(`CrownBeatz server running on http://localhost:${PORT}`);
