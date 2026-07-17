@@ -151,6 +151,41 @@ const showLoader = (show = true) => {
   }
 };
 
+// Policy Modal Content Switcher
+window.openPolicy = (type) => {
+  const title = document.getElementById('policy-title');
+  const content = document.getElementById('policy-content');
+  if(type === 'terms') {
+    title.innerHTML = 'Terms & Conditions <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById(\'policy-modal\').classList.remove(\'active\')"></i>';
+    content.innerHTML = `
+      <p style="margin-bottom:10px;">By purchasing a ticket for CrownBeatz, you agree to abide by all event rules and regulations.</p>
+      <ul style="margin-left: 20px; margin-bottom: 15px;">
+        <li style="margin-bottom: 5px;">Valid government ID is required for entry.</li>
+        <li style="margin-bottom: 5px;">Management reserves the right to refuse admission.</li>
+        <li style="margin-bottom: 5px;">No outside food, beverages, or illegal substances allowed.</li>
+        <li>Event organizers are not responsible for lost or stolen items.</li>
+      </ul>
+      <p>For any further details, contact: <strong>+91 81248 72367</strong></p>
+    `;
+  } else if(type === 'privacy') {
+    title.innerHTML = 'Privacy Policy <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById(\'policy-modal\').classList.remove(\'active\')"></i>';
+    content.innerHTML = `
+      <p style="margin-bottom:10px;">We respect your privacy. Any personal information (name, phone, email) collected during booking is used strictly for event verification and ticketing purposes.</p>
+      <p style="margin-bottom:15px;">We do not sell, rent, or share your data with unauthorized third parties.</p>
+      <p>For any privacy concerns, contact: <strong>crownbeatzorg@gmail.com</strong></p>
+    `;
+  } else if(type === 'return') {
+    title.innerHTML = 'Return Policy <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById(\'policy-modal\').classList.remove(\'active\')"></i>';
+    content.innerHTML = `
+      <h4 style="color: #ff3366; margin-bottom: 10px; font-size: 1.1rem;">No Returns After Payment</h4>
+      <p style="margin-bottom:10px;">All ticket sales are strictly final and non-refundable.</p>
+      <p style="margin-bottom:15px;">Once a payment has been successfully verified and a ticket is issued, we cannot process cancellations or issue refunds under any circumstances.</p>
+      <p>For any further details about our return policy, please contact us directly at:<br>
+      <strong style="color: #fff; display: inline-block; margin-top: 5px;"><i class="fa-solid fa-phone"></i> +91 81248 72367</strong></p>
+    `;
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   initPricingCalculator();
 });

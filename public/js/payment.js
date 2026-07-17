@@ -49,6 +49,18 @@ const closeUpiModal = () => {
   currentBookingData = null;
 };
 
+// UTR Guide Modal Toggle Logic
+document.getElementById('btn-show-utr-guide')?.addEventListener('click', () => {
+  const modal = document.getElementById('utr-guide-modal');
+  if (modal) modal.classList.add('active');
+});
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-close-utr-icon' || e.target.id === 'btn-close-utr-guide') {
+    const modal = document.getElementById('utr-guide-modal');
+    if (modal) modal.classList.remove('active');
+  }
+});
+
 btnCancelUpi.addEventListener('click', closeUpiModal);
 
 const handleBookingSubmit = (e) => {

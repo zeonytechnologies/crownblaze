@@ -113,9 +113,9 @@
 
               <div style="display: flex; justify-content: space-between; align-items: center;" id="child-pass-row">
                 <div>
-                  <div style="font-weight: 600;">Child Pass</div>
-                  <div style="font-size: 0.8rem; color: #00ff66;" id="child-pass-price">Free (Under 12)</div>
-                  <div style="font-size: 0.7rem; color: var(--color-text-secondary);" id="child-pass-desc">Must be accompanied by parents</div>
+                  <div style="font-weight: 600; text-align: left;">Child Pass</div>
+                  <div style="font-size: 0.8rem; color: #00ff66; text-align: left;" id="child-pass-price">Free (Under 12)</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-secondary); text-align: left;" id="child-pass-desc">Must be accompanied by parents (Allowed only in Silver & Gold Passes)</div>
                 </div>
                 <div class="quantity-control">
                   <button type="button" class="qty-btn" id="qty-child-minus">-</button>
@@ -181,7 +181,7 @@
             </div>
 
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid silver; text-align: center;">
-              <div style="font-weight: bold; color: silver; font-size: 1.1rem; margin-bottom: 10px;">Silver VIP</div>
+              <div style="font-weight: bold; color: silver; font-size: 1.1rem; margin-bottom: 10px;">Silver Pass</div>
               <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
                 <li style="margin-bottom: 6px;">Chair Seating Provided</li>
                 <li style="margin-bottom: 6px;">Access to Dancing Area</li>
@@ -190,7 +190,7 @@
             </div>
 
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 3px solid #ffd700; text-align: center;">
-              <div style="font-weight: bold; color: #ffd700; font-size: 1.1rem; margin-bottom: 10px;">Gold Premium</div>
+              <div style="font-weight: bold; color: #ffd700; font-size: 1.1rem; margin-bottom: 10px;">Gold Pass</div>
               <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
                 <li style="margin-bottom: 6px;">Premium VIP Seating</li>
                 <li style="margin-bottom: 6px;">Access to Dancing Area</li>
@@ -205,9 +205,7 @@
   </section>
 
     <!-- Big DJ Festival Banner -->
-    <div class="hero-banner-container">
-      <div class="hero-banner-image"></div>
-    </div>
+    
   </section>
 
 
@@ -251,7 +249,7 @@
 
 
   <!-- Music Experience Section -->
-  <section class="genres">
+  <section class="genres" hidden>
     <div class="container">
       <h2 class="section-title">Music Experience</h2>
       <div class="genre-grid">
@@ -363,14 +361,15 @@
       <div class="footer-col">
         <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">CROWN<span>BEATZ</span></a>
         <p>The premium music event experience. Sound, lights, and memories that last a lifetime.</p>
-        <p><i class="fa-solid fa-envelope"></i> contact@crownbeatz.com</p>
+        <p style="margin-bottom: 5px;"><i class="fa-solid fa-phone"></i> +91 81248 72367</p>
+        <p><i class="fa-solid fa-envelope"></i> crownbeatzorg@gmail.com</p>
       </div>
       <div class="footer-col">
         <h4>Legal Links</h4>
         <ul>
-          <li><a href="#">Terms & Conditions</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#" onclick="event.preventDefault(); document.getElementById('policy-modal').classList.add('active'); openPolicy('terms')">Terms & Conditions</a></li>
+          <li><a href="#" onclick="event.preventDefault(); document.getElementById('policy-modal').classList.add('active'); openPolicy('privacy')">Privacy Policy</a></li>
+          <li><a href="#" onclick="event.preventDefault(); document.getElementById('policy-modal').classList.add('active'); openPolicy('return')">Return Policy</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -414,7 +413,10 @@
       </div>
 
       <div class="form-group" style="margin-bottom: 20px; text-align: left;">
-        <label for="upi-utr"><i class="fa-solid fa-hashtag"></i> Transaction ID (UTR)</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label for="upi-utr" style="margin-bottom: 0;"><i class="fa-solid fa-hashtag"></i> Transaction ID (UTR)</label>
+          <span id="btn-show-utr-guide" style="font-size: 0.75rem; color: var(--color-neon-blue); cursor: pointer; text-decoration: underline;">How to find UTR?</span>
+        </div>
         <input type="text" id="upi-utr" class="form-control" placeholder="Enter 12-digit UTR after payment" maxlength="12" />
         <small style="color: var(--color-text-secondary); font-size: 0.8rem; margin-top: 5px; display: block;">After paying, manually enter the 12-digit reference number here.</small>
       </div>
@@ -430,13 +432,45 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- Frontend Logic scripts -->
-  <script src="/js/app.js"></script>
-  <script src="/js/payment.js"></script>
+  <script src="/js/app.js?v=2"></script>
+  <script src="/js/payment.js?v=2"></script>
 
   <!-- Scroll to top / form FAB -->
   <button id="fab-book" class="fab-btn">
     <i class="fa-solid fa-ticket"></i> Book Now
   </button>
+
+  <!-- UTR Guide Modal -->
+  <div id="utr-guide-modal" class="upi-modal-overlay" style="z-index: 2100;">
+    <div class="upi-modal-content glass-card" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+      <h3 style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title); display: flex; justify-content: space-between; align-items: center;">
+        How to find UTR
+        <i id="btn-close-utr-icon" class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;"></i>
+      </h3>
+      <div style="margin-bottom: 20px;">
+        <h4 style="margin-bottom: 10px; color: #ccc;">PhonePe</h4>
+        <img src="/images/utr%20ref%201.jpeg" alt="PhonePe UTR Guide" style="width: 100%; border-radius: 8px; border: 1px solid var(--glass-border); margin-bottom: 10px;" />
+      </div>
+      <div>
+        <h4 style="margin-bottom: 10px; color: #ccc;">Google Pay (GPay)</h4>
+        <img src="/images/utr%20ref%202.jpeg" alt="GPay UTR Guide" style="width: 100%; border-radius: 8px; border: 1px solid var(--glass-border);" />
+      </div>
+      <button id="btn-close-utr-guide" class="btn-glow" style="width: 100%; margin-top: 20px;">Got it</button>
+    </div>
+  </div>
+  <!-- Policy Modal -->
+  <div id="policy-modal" class="upi-modal-overlay" style="z-index: 2200;">
+    <div class="upi-modal-content glass-card" style="max-width: 600px; max-height: 90vh; overflow-y: auto; text-align: left;">
+      <h3 id="policy-title" style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title); display: flex; justify-content: space-between; align-items: center;">
+        Policy Title
+        <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById('policy-modal').classList.remove('active')"></i>
+      </h3>
+      <div id="policy-content" style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6;">
+        <!-- Content will be injected here -->
+      </div>
+      <button class="btn-glow" style="width: 100%; margin-top: 25px;" onclick="document.getElementById('policy-modal').classList.remove('active')">Close</button>
+    </div>
+  </div>
 
 </body>
 </html>
