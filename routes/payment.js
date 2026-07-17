@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const Razorpay = require('razorpay');
+const { Cashfree } = require("cashfree-pg");
 const { supabase } = require('../supabase/client');
 const { generateQRCode } = require('../utils/qr');
 const { sendTicketEmail } = require('../utils/mailer');
@@ -10,19 +10,15 @@ const PRICE_COUPLES = 499;
 const PRICE_ADULT = 299;
 const PRICE_CHILD = 199;
 
-// Initialize Razorpay
-// In local development or Vercel, these must be loaded from process.env
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret',
-});
+// Initialize Cashfree SDK v6
+const cfEnvironment = Cashfree.SANDBOX; // Change to Cashfree.PRODUCTION when live
+const cf = new Cashfree(cfEnvironment, process.env.CASHFREE_APP_ID || 'dummy', process.env.CASHFREE_SECRET_KEY || 'dummy');
 
 // POST: /api/payment/create-order
 router.post('/create-order', async (req, res) => {
   try {
     const { name, email, phone, couplesCount, adultCount, childCount } = req.body;
 
-    // Validate fields
     if (!name || !email || !phone) {
       return res.status(400).json({ success: false, error: 'All fields are required.' });
     }
@@ -46,27 +42,31 @@ router.post('/create-order', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid phone number format.' });
     }
 
-    // Calculate prices
     const totalAmount = (countCouples * PRICE_COUPLES) + (countAdult * PRICE_ADULT) + (countChild * PRICE_CHILD);
+    const orderId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // Create Razorpay Order
-    const options = {
-      amount: Math.round(totalAmount * 100), // Razorpay accepts in paise
-      currency: 'INR',
-      receipt: `receipt_${Date.now()}`,
+    let request = {
+      order_amount: totalAmount,
+      order_currency: "INR",
+      order_id: orderId,
+      customer_details: {
+        customer_id: `cust_${Date.now()}`,
+        customer_phone: phone,
+        customer_name: name,
+        customer_email: email
+      }
     };
 
-    const order = await razorpay.orders.create(options);
-
+    const response = await cf.PGCreateOrder(request);
+    
     res.json({
       success: true,
-      orderId: order.id,
-      amount: order.amount,
-      keyId: process.env.RAZORPAY_KEY_ID
+      payment_session_id: response.data.payment_session_id,
+      order_id: response.data.order_id
     });
 
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error('Error creating Cashfree order:', error.response?.data || error);
     res.status(500).json({ success: false, error: 'Failed to create payment order.' });
   }
 });
@@ -75,9 +75,7 @@ router.post('/create-order', async (req, res) => {
 router.post('/verify', async (req, res) => {
   try {
     const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
+      order_id,
       name,
       email,
       phone,
@@ -86,26 +84,28 @@ router.post('/verify', async (req, res) => {
       childCount
     } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    if (!order_id) {
       return res.status(400).json({ success: false, error: 'Payment details missing.' });
     }
 
-    // Verify signature
-    const secret = process.env.RAZORPAY_KEY_SECRET || 'dummy_secret';
-    const generatedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(razorpay_order_id + '|' + razorpay_payment_id)
-      .digest('hex');
+    // Verify payment directly with Cashfree servers
+    const response = await cf.PGOrderFetchPayments(order_id);
+    const payments = response.data || [];
+    
+    // Find the successful payment attempt
+    const successfulPayment = payments.find(p => p.payment_status === 'SUCCESS');
 
-    if (generatedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false, error: 'Payment verification failed.' });
+    if (!successfulPayment) {
+      return res.status(400).json({ success: false, error: 'Payment verification failed or pending.' });
     }
+    
+    const payment_id = successfulPayment.cf_payment_id.toString();
 
-    // Prevent duplicate entries by checking if the order_id or payment_id is already stored
+    // Prevent duplicate entries
     const { data: existingTicket } = await supabase
       .from('tickets')
       .select('ticket_id')
-      .eq('order_id', razorpay_order_id)
+      .eq('order_id', order_id)
       .maybeSingle();
 
     if (existingTicket) {
@@ -124,13 +124,11 @@ router.post('/verify', async (req, res) => {
     const countAdult = parseInt(adultCount, 10) || 0;
     const countChild = parseInt(childCount, 10) || 0;
     
-    const ticketsNum = (countCouples * 2) + countAdult + countChild; // Couples = 2 persons
+    const ticketsNum = (countCouples * 2) + countAdult + countChild;
     const totalAmount = (countCouples * PRICE_COUPLES) + (countAdult * PRICE_ADULT) + (countChild * PRICE_CHILD);
 
-    // Generate QR Code containing only the ticket ID
     const qrData = await generateQRCode(ticketId);
 
-    // Store Ticket in Supabase
     const { error: dbError } = await supabase.from('tickets').insert([{
       ticket_id: ticketId,
       name,
@@ -141,8 +139,8 @@ router.post('/verify', async (req, res) => {
       adult_count: countAdult,
       child_count: countChild,
       amount: totalAmount,
-      payment_id: razorpay_payment_id,
-      order_id: razorpay_order_id,
+      payment_id: payment_id,
+      order_id: order_id,
       qr_data: qrData,
       attendance: false
     }]);
@@ -152,7 +150,6 @@ router.post('/verify', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Payment verified, but booking save failed. Please contact support.' });
     }
 
-    // Send the automated ticket email
     await sendTicketEmail({
       name,
       email,
@@ -170,7 +167,7 @@ router.post('/verify', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error verifying payment:', error);
+    console.error('Error verifying Cashfree payment:', error.response?.data || error);
     res.status(500).json({ success: false, error: 'Internal payment verification error.' });
   }
 });

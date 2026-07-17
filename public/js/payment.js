@@ -1,6 +1,11 @@
-// Payment flow coordination using Razorpay Checkout
+// Payment flow coordination using Cashfree Checkout
 const bookingForm = document.getElementById('booking-form');
 const btnSubmitBooking = document.getElementById('btn-submit-booking');
+
+// Initialize Cashfree
+const cashfree = Cashfree({
+    mode: "sandbox",
+});
 
 const handleBookingSubmit = async (e) => {
   e.preventDefault();
@@ -19,25 +24,16 @@ const handleBookingSubmit = async (e) => {
     showToast('Please select at least one ticket.', 'error');
     return;
   }
-  if (!name) {
-    showToast('Please enter your full name.', 'error');
-    return;
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast('Please enter a valid email address.', 'error');
-    return;
-  }
-  if (!phone || !/^[0-9\s+-]{10,15}$/.test(phone)) {
-    showToast('Please enter a valid phone number (10-15 digits).', 'error');
+  if (!name || !email || !phone) {
+    showToast('Please enter all your details.', 'error');
     return;
   }
 
   try {
-    // Disable submit button and show loader
     btnSubmitBooking.disabled = true;
     showLoader(true);
 
-    // 1. Create Razorpay order
+    // 1. Create Cashfree order session
     const orderResponse = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -52,35 +48,37 @@ const handleBookingSubmit = async (e) => {
       return;
     }
 
-    // 2. Configure & Open Razorpay checkout modal
-    const options = {
-      key: orderData.keyId,
-      amount: orderData.amount,
-      currency: 'INR',
-      name: 'CrownBeatz DJ Night',
-      description: `Booking for ${totalTickets} Ticket(s)`,
-      image: '/images/logo-badge.png', // Optional branding placeholder
-      order_id: orderData.orderId,
-      prefill: {
-        name: name,
-        email: email,
-        contact: phone
-      },
-      theme: {
-        color: '#7b2cbf' // Purple brand theme
-      },
-      handler: async function (response) {
-        // Payment success callback from Razorpay
+    // Hide loader before triggering Cashfree modal
+    showLoader(false);
+
+    // 2. Open Cashfree Drop-in Checkout
+    let checkoutOptions = {
+      paymentSessionId: orderData.payment_session_id,
+      redirectTarget: "_modal",
+    };
+
+    cashfree.checkout(checkoutOptions).then(async (result) => {
+      if (result.error) {
+        btnSubmitBooking.disabled = false;
+        showToast('Payment window closed or encountered an error.', 'error');
+        console.error("Cashfree Checkout Error:", result.error);
+        return;
+      }
+      
+      if (result.redirect) {
+        console.log("Payment will be redirected");
+        return;
+      }
+      
+      if (result.paymentDetails) {
+        // Payment was successful in UI! Now verify with our backend.
+        showLoader(true);
         try {
-          showLoader(true);
-          // 3. Verify Razorpay signature on our backend
           const verifyResponse = await fetch('/api/payment/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
+              order_id: orderData.order_id,
               name,
               email,
               phone,
@@ -97,7 +95,7 @@ const handleBookingSubmit = async (e) => {
           } else {
             showLoader(false);
             btnSubmitBooking.disabled = false;
-            showToast(verifyData.error || 'Signature verification failed.', 'error');
+            showToast(verifyData.error || 'Backend verification failed.', 'error');
           }
         } catch (err) {
           console.error('Verification error:', err);
@@ -105,19 +103,8 @@ const handleBookingSubmit = async (e) => {
           btnSubmitBooking.disabled = false;
           showToast('Payment verify failed. Please contact support.', 'error');
         }
-      },
-      modal: {
-        ondismiss: function () {
-          showLoader(false);
-          btnSubmitBooking.disabled = false;
-          showToast('Payment window closed by user.', 'info');
-        }
       }
-    };
-
-    const rzp = new Razorpay(options);
-    showLoader(false); // Hide the loader before displaying the modal
-    rzp.open();
+    });
 
   } catch (error) {
     console.error('Booking submission error:', error);
