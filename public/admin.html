@@ -79,6 +79,28 @@
           <span class="value" id="stat-pending">0</span>
         </div>
       </div>
+      
+      <!-- Category Breakdown -->
+      <div class="glass-card" style="margin-bottom: 40px; padding: 20px;">
+        <h3 style="margin-bottom: 15px; color: var(--color-neon-blue);">Category Breakdown (Adults / Couples)</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+            <h4 style="color: #fff; margin-bottom: 10px;">General</h4>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="cat-gen-adult" style="color:#fff;">0</strong></p>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="cat-gen-couple" style="color:#fff;">0</strong></p>
+          </div>
+          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #c0c0c0;">
+            <h4 style="color: #c0c0c0; margin-bottom: 10px;">Silver</h4>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="cat-sil-adult" style="color:#fff;">0</strong></p>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="cat-sil-couple" style="color:#fff;">0</strong></p>
+          </div>
+          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #ffd700;">
+            <h4 style="color: #ffd700; margin-bottom: 10px;">Gold</h4>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="cat-gol-adult" style="color:#fff;">0</strong></p>
+            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="cat-gol-couple" style="color:#fff;">0</strong></p>
+          </div>
+        </div>
+      </div>
 
       <!-- Tickets Database Manager -->
       <div class="glass-container" style="margin-top: 40px;">
@@ -90,11 +112,14 @@
         <div class="control-panel">
           <input type="text" id="ticket-search" class="form-control search-input" placeholder="Search by name, phone, ticket ID, or payment ID...">
           
-          <select id="filter-attendance" class="filter-select">
-            <option value="all">All Attendance</option>
-            <option value="true">Checked In Only</option>
-            <option value="false">Pending Only</option>
-          </select>
+          <div style="display: flex; gap: 10px;">
+            <select id="filter-attendance" class="filter-select">
+              <option value="all">All Attendance</option>
+              <option value="true">Checked In Only</option>
+              <option value="false">Pending Only</option>
+            </select>
+            <button id="btn-export-excel" class="btn-glow" style="padding: 10px 20px;"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+          </div>
         </div>
 
         <!-- Table -->
@@ -103,17 +128,20 @@
             <thead>
               <tr>
                 <th>Ticket ID</th>
+                <th>UTR</th>
+                <th>Category</th>
                 <th>Customer</th>
                 <th>Phone</th>
                 <th>Qty</th>
                 <th>Amount</th>
+                <th>Payment</th>
                 <th>Attendance</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="tickets-table-body">
               <tr>
-                <td colspan="7" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
+                <td colspan="9" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
               </tr>
             </tbody>
           </table>
@@ -159,6 +187,10 @@
           <span id="modal-ticket-id" style="font-weight: 600; color: var(--color-neon-blue);">-</span>
         </div>
         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Category</span>
+          <span id="modal-category" style="font-weight: 600; color: #ffd700;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
           <span style="color: var(--color-text-secondary);">Payment ID</span>
           <span id="modal-payment-id" style="font-weight: 600;">-</span>
         </div>
@@ -169,6 +201,10 @@
         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
           <span style="color: var(--color-text-secondary);">Amount Paid</span>
           <span id="modal-amount" style="font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+          <span style="color: var(--color-text-secondary);">Payment Status</span>
+          <span id="modal-payment-status" style="font-weight: 600;">-</span>
         </div>
         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
           <span style="color: var(--color-text-secondary);">Booking Date</span>
@@ -185,6 +221,10 @@
         <img id="modal-qr-img" src="" alt="QR" style="width: 100%; height: auto; object-fit: contain;">
       </div>
 
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;" id="payment-actions-container">
+        <button id="btn-modal-reject-payment" class="btn-glow" style="flex: 1; border-color: #ff3366; color: #ff3366; background: transparent;"><i class="fa-solid fa-times"></i> Reject</button>
+        <button id="btn-modal-verify-payment" class="btn-glow" style="flex: 1; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-check"></i> Approve</button>
+      </div>
       <div style="display: flex; gap: 10px;">
         <button id="btn-modal-toggle-attendance" class="btn-glow" style="width: 100%;">Toggle Check-in</button>
       </div>

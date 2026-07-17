@@ -14,7 +14,7 @@ router.get('/:ticketId', async (req, res) => {
 
     const { data: ticket, error } = await supabase
       .from('tickets')
-      .select('name, ticket_id, payment_id, ticket_count, couples_count, adult_count, child_count, amount, qr_data, booked_at, attendance')
+      .select('name, ticket_id, payment_id, ticket_count, couples_count, adult_count, child_count, amount, qr_data, booked_at, attendance, phone, category')
       .eq('ticket_id', ticketId)
       .maybeSingle();
 

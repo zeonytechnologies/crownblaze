@@ -94,13 +94,22 @@
               <input type="tel" id="phone-number" class="form-control" placeholder="9876543210" required>
             </div>
 
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label for="ticket-category" style="color: var(--color-neon-blue); font-weight: 600;">Ticket Category</label>
+              <select id="ticket-category" class="form-control" style="background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; appearance: auto;">
+                <option value="General" style="background: #121212;">General - Standing, Dancing Area</option>
+                <option value="Silver" style="background: #121212;">Silver - Chair Sitting, Dancing Area</option>
+                <option value="Gold" style="background: #121212;">Gold - Premium Seating, Dancing Area</option>
+              </select>
+            </div>
+
             <div style="margin-bottom: 24px; border: 1px solid var(--glass-border); padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.2);">
               <label style="display:block; font-size:1rem; margin-bottom:12px; color: var(--color-neon-blue); font-weight:600;">Select Passes</label>
               
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
                   <div style="font-weight: 600;">Couples Pass</div>
-                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹499 per couple</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);"><span id="lbl-price-couples">₹549</span> per couple</div>
                 </div>
                 <div class="quantity-control">
                   <button type="button" class="qty-btn" id="qty-couples-minus">-</button>
@@ -112,7 +121,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
                   <div style="font-weight: 600;">Adult Pass</div>
-                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹299 per person</div>
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);"><span id="lbl-price-adult">₹349</span> per person</div>
                 </div>
                 <div class="quantity-control">
                   <button type="button" class="qty-btn" id="qty-adult-minus">-</button>
@@ -124,7 +133,8 @@
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <div style="font-weight: 600;">Child Pass</div>
-                  <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹199 per child</div>
+                  <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12)</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-secondary);">Must be accompanied by parents</div>
                 </div>
                 <div class="quantity-control">
                   <button type="button" class="qty-btn" id="qty-child-minus">-</button>
@@ -144,21 +154,21 @@
         <div class="glass-card">
           <h3 style="font-size: 1.5rem; margin-bottom: 24px;">Ticket Breakdown</h3>
           <div style="background: rgba(255, 255, 255, 0.01); padding: 20px; border-radius: 16px; border: 1px solid var(--glass-border);">
-            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">CrownBeatz VIP Entry Pass</p>
-            <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Grants full access to dance floor, general standing zone & laser visual experience.</p>
+            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">CrownBeatz <span id="summary-category-name">General</span> Pass</p>
+            <p id="summary-category-features" style="color: var(--color-text-secondary); font-size: 0.9rem;">Standing & dancing area provided.</p>
           </div>
 
           <div class="pricing-breakdown">
             <div class="breakdown-row">
-              <span>Couples (₹499)</span>
+              <span>Couples (<span id="summary-price-couples">₹549</span>)</span>
               <span>x <span id="summary-couples">0</span></span>
             </div>
             <div class="breakdown-row">
-              <span>Adult (₹299)</span>
+              <span>Adult (<span id="summary-price-adult">₹349</span>)</span>
               <span>x <span id="summary-adult">1</span></span>
             </div>
             <div class="breakdown-row">
-              <span>Child (₹199)</span>
+              <span>Child (Free)</span>
               <span>x <span id="summary-child">0</span></span>
             </div>
             <hr style="border-color: var(--glass-border); margin: 10px 0;">
@@ -173,7 +183,7 @@
               <i class="fa-solid fa-shield-halved"></i> 256-Bit SSL Secure
             </div>
             <div class="secure-badge">
-              <i class="fa-solid fa-credit-card"></i> Razorpay Verified
+              <i class="fa-solid fa-check-circle"></i> Admin Verified via UTR
             </div>
           </div>
         </div>
@@ -238,26 +248,67 @@
           <div class="dj-img"></div>
         </div>
         <div class="dj-details">
-          <h3>DJ HYPNOTIC</h3>
-          <div class="dj-subtitle">Master of progressive house & techno</div>
-          <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
-            Hailing from the main stages of international music festivals, DJ Hypnotic brings an explosive setlist crafted specifically for CrownBeatz. Known for blending hypnotic techno rhythms with high-intensity commercial anthems and custom sub-bass elements.
+          <h3>DJ HARLY <span style="font-size: 1rem; color: var(--color-text-secondary); text-transform: none; font-weight: 400; letter-spacing: normal;">(Harleen Kaur)</span></h3>
+          <div class="dj-subtitle">Prominent Open-Format DJ • Coimbatore</div>
+          <p style="color: var(--color-text-secondary); margin-bottom: 16px;">
+            Get ready to experience the most electrifying setlist with DJ Harly! Known for her energetic stage presence and interactive crowd control, she specializes in multi-genre, high-energy sets that cater to diverse crowds across South India.
           </p>
-          <div>
-            <span class="genre-pill">EDM</span>
-            <span class="genre-pill">Techno</span>
-            <span class="genre-pill">House</span>
-            <span class="genre-pill">Bollywood Mashups</span>
+          <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
+            A regular headliner at top nightlife hubs like Zen Lounge, Pirates Bar, and 10 Downing Street, her signature style seamlessly blends Tamil Kuthu, commercial Bollywood, Punjabi club anthems, and global English EDM & Pop.
+          </p>
+          <div style="margin-bottom: 20px;">
+            <span class="genre-pill">Open-Format</span>
+            <span class="genre-pill">EDM & Pop</span>
+            <span class="genre-pill">Bollywood & Punjabi</span>
+            <span class="genre-pill">Tamil Kuthu</span>
           </div>
           <div class="social-links">
-            <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" class="social-link"><i class="fa-brands fa-soundcloud"></i></a>
-            <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.instagram.com/dj_harly?igsh=d2xhanR4aWV2YXB3" target="_blank" class="social-link"><i class="fa-brands fa-instagram"></i></a>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Event Passes Explanation Section -->
+  <section class="passes-section" style="background: rgba(123, 44, 191, 0.05); border-top: 1px solid rgba(123, 44, 191, 0.2); border-bottom: 1px solid rgba(123, 44, 191, 0.2);">
+    <div class="container">
+      <h2 class="section-title">Event Passes</h2>
+      <div class="genre-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        
+        <div class="genre-card" style="border-top: 3px solid #ccc; text-align: left;">
+          <h3 class="genre-title" style="margin-bottom: 10px;">General Pass</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Standard access with full vibes.</p>
+          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
+            <li style="margin-bottom: 5px;">Standing & Dancing Area</li>
+            <li>Free for Children under 12</li>
+          </ul>
+        </div>
+
+        <div class="genre-card" style="border-top: 3px solid silver; text-align: left;">
+          <h3 class="genre-title" style="color: silver; margin-bottom: 10px;">Silver VIP</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Upgraded experience with comfort.</p>
+          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
+            <li style="margin-bottom: 5px;">Chair Seating Provided</li>
+            <li style="margin-bottom: 5px;">Access to Dancing Area</li>
+            <li>Free for Children under 12</li>
+          </ul>
+        </div>
+
+        <div class="genre-card" style="border-top: 3px solid #ffd700; text-align: left;">
+          <h3 class="genre-title" style="color: #ffd700; margin-bottom: 10px;">Gold Premium</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">The ultimate VIP treatment.</p>
+          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
+            <li style="margin-bottom: 5px;">Premium VIP Seating</li>
+            <li style="margin-bottom: 5px;">Access to Dancing Area</li>
+            <li>Free for Children under 12</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
 
   <!-- Music Experience Section -->
   <section class="genres">
@@ -344,8 +395,8 @@
       <div class="footer-col">
         <h4>Connect With Us</h4>
         <div class="social-links" style="margin-top: 10px;">
+          <a href="https://www.instagram.com/crow.nbeatz?utm_source=qr&igsh=MXE2Y3ExZmxvODN0eA==" target="_blank" class="social-link"><i class="fa-brands fa-instagram"></i></a>
           <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
           <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
         </div>
       </div>
@@ -364,8 +415,37 @@
     <p style="font-family: var(--font-title); font-weight: 600; font-size: 1.1rem; color: var(--color-neon-blue);">Processing Secure Payment...</p>
   </div>
 
-  <!-- Cashfree Script -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <!-- UPI Payment Modal -->
+  <div id="upi-modal" class="upi-modal-overlay">
+    <div class="upi-modal-content glass-card">
+      <h3 style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title);">Secure UPI Payment</h3>
+      <p style="color: var(--color-text-secondary); margin-bottom: 20px;">Scan the QR code or click the button to pay <strong>₹<span id="upi-amount-display"></span></strong> directly via PhonePe, GPay, or Paytm.</p>
+      
+      <div id="upi-qrcode-container" style="background: white; padding: 15px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+        <div id="upi-qrcode"></div>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <a id="upi-deeplink-btn" href="#" class="btn-glow" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; font-weight: bold;">
+          <i class="fa-brands fa-google-pay" style="font-size: 1.8rem;"></i> <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i> PAY WITH UPI APP
+        </a>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+        <label for="upi-utr"><i class="fa-solid fa-hashtag"></i> Transaction ID (UTR)</label>
+        <input type="text" id="upi-utr" class="form-control" placeholder="Enter 12-digit UTR after payment" maxlength="12" />
+        <small style="color: var(--color-text-secondary); font-size: 0.8rem; margin-top: 5px; display: block;">After paying, manually enter the 12-digit reference number here.</small>
+      </div>
+
+      <div style="display: flex; gap: 15px;">
+        <button id="btn-cancel-upi" class="btn-glow" style="background: transparent; color: var(--color-text-primary); flex: 1;">Cancel</button>
+        <button id="btn-verify-upi" class="btn-glow" style="flex: 1;">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode.js Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- Frontend Logic scripts -->
   <script src="/js/app.js"></script>

@@ -105,7 +105,7 @@
 
       <!-- Quick Scan Input box fallback -->
       <div style="margin-top: 24px; display: flex; gap: 10px;">
-        <input type="text" id="manual-scan-input" class="form-control" placeholder="Enter Ticket ID manually (e.g. CB-2026-000001)">
+        <input type="text" id="manual-scan-input" class="form-control" placeholder="Enter Ticket ID or Phone Number...">
         <button id="btn-manual-verify" class="btn-glow" style="padding: 12px 24px;">Verify</button>
       </div>
     </div>
@@ -122,6 +122,10 @@
 
       <!-- Details List -->
       <div id="result-details" style="display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 24px; background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border);">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Category</span>
+          <span id="res-category" style="font-weight: 600; font-size: 1.2rem; color: #ffd700;">-</span>
+        </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--color-text-secondary);">Attendee</span>
           <span id="res-name" style="font-weight: 600;">-</span>

@@ -242,6 +242,8 @@ tr:hover td {
 .modal-card {
   max-width: 500px;
   width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
   border-radius: 20px;
   position: relative;
   animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;

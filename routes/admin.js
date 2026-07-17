@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { supabase } = require('../supabase/client');
 const { adminAuth } = require('../middleware/auth');
+const { sendTicketEmail } = require('../utils/mailer');
 
 // Self-seed helper: inserts default admin if none exists
 const seedDefaultAdmin = async () => {
@@ -89,7 +90,7 @@ router.get('/dashboard', async (req, res) => {
     // 1. Fetch total tickets sold (sum of ticket_count)
     const { data: sumData, error: sumError } = await supabase
       .from('tickets')
-      .select('ticket_count, amount, attendance, booked_at');
+      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count');
 
     if (sumError) throw sumError;
 
@@ -98,6 +99,12 @@ router.get('/dashboard', async (req, res) => {
     let checkedIn = 0;
     let pending = 0;
     let todayBookings = 0;
+    
+    const categoryStats = {
+      General: { adults: 0, couples: 0 },
+      Silver: { adults: 0, couples: 0 },
+      Gold: { adults: 0, couples: 0 }
+    };
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -106,6 +113,12 @@ router.get('/dashboard', async (req, res) => {
       const ticketsCount = t.ticket_count || 0;
       totalTickets += ticketsCount;
       revenue += parseFloat(t.amount || 0);
+      
+      const cat = t.category || 'General';
+      if (categoryStats[cat]) {
+        categoryStats[cat].adults += (t.adult_count || 0);
+        categoryStats[cat].couples += (t.couples_count || 0);
+      }
       
       if (t.attendance) {
         checkedIn += ticketsCount;
@@ -134,7 +147,8 @@ router.get('/dashboard', async (req, res) => {
         todayBookings,
         revenue: Math.round(revenue * 100) / 100,
         checkedIn,
-        pending
+        pending,
+        categoryStats
       },
       recentBookings: recent || []
     });
@@ -167,25 +181,33 @@ router.get('/tickets', async (req, res) => {
     }
 
     // Pagination
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const from = (pageNum - 1) * limitNum;
-    const to = from + limitNum - 1;
+    let pageNum = parseInt(page, 10);
+    let limitNum = 10;
+    
+    if (limit === 'all') {
+      // Get total exact count for 'all'
+      const { count: c } = await supabase.from('tickets').select('*', { count: 'exact', head: true });
+      limitNum = c || 999999;
+      query = query.order('booked_at', { ascending: false });
+    } else {
+      limitNum = parseInt(limit, 10);
+      const from = (pageNum - 1) * limitNum;
+      const to = from + limitNum - 1;
+      query = query
+        .order('booked_at', { ascending: false })
+        .range(from, to);
+    }
 
-    query = query
-      .order('booked_at', { ascending: false })
-      .range(from, to);
-
-    const { data, count, error } = await query;
+    const { data, count: finalCount, error } = await query;
 
     if (error) throw error;
 
     res.json({
       success: true,
       tickets: data || [],
-      total: count || 0,
+      total: finalCount || 0,
       page: pageNum,
-      totalPages: Math.ceil((count || 0) / limitNum)
+      totalPages: limit === 'all' ? 1 : Math.ceil((finalCount || 0) / limitNum)
     });
 
   } catch (error) {
@@ -265,6 +287,15 @@ router.get('/verify/:ticketId', async (req, res) => {
         success: false,
         status: 'INVALID',
         message: '❌ Invalid Ticket: Ticket ID does not exist in records.'
+      });
+    }
+
+    // NEW: Check Payment Status
+    if (ticket.payment !== 'Verified') {
+      return res.json({
+        success: false,
+        status: 'INVALID',
+        message: `❌ Payment Verification Failed: Ticket status is "${ticket.payment || 'Not Verified'}".`
       });
     }
 
@@ -379,6 +410,152 @@ router.post('/checkin', async (req, res) => {
   } catch (error) {
     console.error('Error verifying scanned ticket:', error);
     res.status(500).json({ success: false, error: 'Internal server error verifying ticket.' });
+  }
+});
+
+// POST: /api/admin/verify-payment
+router.post('/verify-payment', async (req, res) => {
+  try {
+    const { ticketId, status } = req.body; // status should be 'Verified' or 'Rejected'
+    
+    console.log(`[Verify Payment API] Received ticketId: ${ticketId}, status: ${status}`);
+
+    if (!ticketId || !status) {
+      return res.status(400).json({ success: false, error: 'Ticket ID and status are required.' });
+    }
+
+    const { data: ticket, error: fetchError } = await supabase
+      .from('tickets')
+      .select('*')
+      .eq('ticket_id', ticketId)
+      .maybeSingle();
+
+    if (fetchError || !ticket) {
+      return res.status(404).json({ success: false, error: 'Ticket not found.' });
+    }
+
+    // Update payment status
+    const { error: updateError } = await supabase
+      .from('tickets')
+      .update({ payment: status })
+      .eq('ticket_id', ticketId);
+
+    if (updateError) {
+      console.error('Error updating payment status:', updateError);
+      return res.status(500).json({ success: false, error: 'Failed to update payment status.' });
+    }
+
+    // If verified, send the email!
+    if (status === 'Verified') {
+      try {
+        await sendTicketEmail({
+          name: ticket.name,
+          email: ticket.email,
+          ticketId: ticket.ticket_id,
+          amount: ticket.amount,
+          qrData: ticket.qr_data,
+          category: ticket.category,
+          couples: ticket.couples_count,
+          adults: ticket.adult_count,
+          children: ticket.child_count
+        });
+      } catch (emailErr) {
+        console.error('Failed to send verified ticket email:', emailErr);
+        // We still return success since payment was verified, but flag the email error
+        return res.json({ success: true, message: 'Payment verified, but email failed to send.' });
+      }
+    }
+
+    res.json({ success: true, message: `Payment successfully marked as ${status}.` });
+
+  } catch (error) {
+    console.error('Error in /verify-payment:', error);
+    res.status(500).json({ success: false, error: 'Internal server error verifying payment.' });
+  }
+});
+
+// POST: /api/admin/verify-manual
+router.post('/verify-manual', async (req, res) => {
+  try {
+    const { identifier } = req.body;
+    if (!identifier) {
+      return res.status(400).json({ success: false, error: 'Ticket ID or Phone Number is required.' });
+    }
+
+    const { data: ticket, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .or(`ticket_id.eq.${identifier},phone.eq.${identifier}`)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!ticket) {
+      return res.json({
+        success: false,
+        status: 'INVALID',
+        message: '❌ Invalid Ticket: No record found for that ID or Phone Number.'
+      });
+    }
+
+    if (ticket.payment !== 'Verified') {
+      return res.json({
+        success: false,
+        status: 'INVALID',
+        message: `❌ Payment Verification Failed: Ticket status is "${ticket.payment || 'Not Verified'}".`
+      });
+    }
+
+    if (ticket.attendance) {
+      return res.json({
+        success: true,
+        status: 'ALREADY_CHECKED_IN',
+        message: '⚠️ Already Checked In (Fully)',
+        ticket
+      });
+    }
+
+    // Calculate remaining people
+    const couples = parseInt(ticket.couples_count, 10) || 0;
+    const adults = parseInt(ticket.adult_count, 10) || 0;
+    const kids = parseInt(ticket.child_count, 10) || 0;
+    const totalAllowed = (couples * 2) + adults + kids;
+    
+    // We fetch current checked in logs for this ticket
+    const { data: logs, error: logsError } = await supabase
+      .from('attendance_logs')
+      .select('headcount')
+      .eq('ticket_id', ticket.ticket_id);
+      
+    if (logsError) throw logsError;
+    
+    const currentCheckedIn = logs.reduce((sum, log) => sum + (log.headcount || 1), 0);
+    const remaining = totalAllowed - currentCheckedIn;
+    
+    if (remaining <= 0) {
+      return res.json({
+        success: true,
+        status: 'ALREADY_CHECKED_IN',
+        message: '⚠️ Already Checked In (Fully)',
+        ticket,
+        currentCheckedIn,
+        totalAllowed
+      });
+    }
+
+    res.json({
+      success: true,
+      status: 'VALID',
+      message: '✅ Valid Ticket: Available for check-in.',
+      ticket,
+      remaining,
+      totalAllowed,
+      currentCheckedIn
+    });
+
+  } catch (error) {
+    console.error('Error in manual verification:', error);
+    res.status(500).json({ success: false, error: 'Failed to verify ticket.' });
   }
 });
 

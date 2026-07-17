@@ -910,3 +910,36 @@ footer {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
 }
+
+/* UPI Modal Styles */
+.upi-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+.upi-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.upi-modal-content {
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  padding: 30px;
+  transform: scale(0.9);
+  transition: var(--transition);
+}
+.upi-modal-overlay.active .upi-modal-content {
+  transform: scale(1);
+}

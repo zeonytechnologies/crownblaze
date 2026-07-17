@@ -107,6 +107,16 @@ const loadDashboardStats = async () => {
       statRevenue.innerText = parseFloat(data.stats.revenue).toFixed(2);
       statChecked.innerText = data.stats.checkedIn;
       statPending.innerText = data.stats.pending;
+      
+      const cats = data.stats.categoryStats;
+      if (cats) {
+        document.getElementById('cat-gen-adult').innerText = cats.General.adults;
+        document.getElementById('cat-gen-couple').innerText = cats.General.couples;
+        document.getElementById('cat-sil-adult').innerText = cats.Silver.adults;
+        document.getElementById('cat-sil-couple').innerText = cats.Silver.couples;
+        document.getElementById('cat-gol-adult').innerText = cats.Gold.adults;
+        document.getElementById('cat-gol-couple').innerText = cats.Gold.couples;
+      }
     } else {
       if (response.status === 401) handleSessionExpired();
     }
@@ -151,7 +161,7 @@ const loadTickets = async () => {
 // Render tickets rows
 const renderTicketsTable = (tickets) => {
   if (tickets.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--color-text-secondary);">No records match the current filters.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--color-text-secondary);">No records match the current filters.</td></tr>`;
     return;
   }
 
@@ -160,10 +170,15 @@ const renderTicketsTable = (tickets) => {
     const statusText = ticket.attendance ? 'Checked In' : 'Pending';
     const checkInBtnText = ticket.attendance ? 'Undo Checkin' : 'Check In';
     const checkInBtnClass = ticket.attendance ? 'btn-secondary' : 'btn-glow';
+    
+    let paymentClass = 'badge pending';
+    if (ticket.payment === 'Verified') paymentClass = 'badge success';
 
     return `
       <tr>
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${ticket.ticket_id}</td>
+        <td style="font-size: 0.75rem; color: var(--color-text-secondary); word-break: break-all; max-width: 100px;">${ticket.payment_id || '-'}</td>
+        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${ticket.category || 'General'}</span></td>
         <td>
           <div style="font-weight: 600;">${ticket.name}</div>
           <div style="font-size:0.8rem; color: var(--color-text-secondary);">${ticket.email}</div>
@@ -171,9 +186,11 @@ const renderTicketsTable = (tickets) => {
         <td>${ticket.phone}</td>
         <td style="font-weight: 600;">${ticket.ticket_count}</td>
         <td>₹${parseFloat(ticket.amount).toFixed(2)}</td>
+        <td><span class="${paymentClass}" style="${ticket.payment === 'Rejected' ? 'color:#ff3366; border-color:#ff3366;' : ''}">${ticket.payment || 'Not Verified'}</span></td>
         <td><span class="${statusClass}">${statusText}</span></td>
         <td>
           <div style="display:flex; gap:10px;">
+            ${ticket.payment !== 'Verified' ? `<button onclick="quickVerifyPayment('${ticket.ticket_id}', 'Verified')" class="btn-glow" style="padding: 6px 12px; font-size:0.8rem; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-check"></i> Verify</button>` : ''}
             <button onclick="toggleAttendance('${ticket.ticket_id}', ${!ticket.attendance})" class="${checkInBtnClass}" style="padding: 6px 12px; font-size:0.8rem;">
               ${checkInBtnText}
             </button>
@@ -226,7 +243,8 @@ window.viewTicketDetails = (ticketId) => {
   document.getElementById('modal-email').innerText = ticket.email;
   document.getElementById('modal-phone').innerText = ticket.phone;
   document.getElementById('modal-ticket-id').innerText = ticket.ticket_id;
-  document.getElementById('modal-payment-id').innerText = ticket.payment_id;
+  document.getElementById('modal-category').innerText = ticket.category || 'General';
+  document.getElementById('modal-payment-id').innerText = ticket.payment_id || '-';
   const typesArray = [];
   if (ticket.couples_count > 0) typesArray.push(`${ticket.couples_count} Couples`);
   if (ticket.adult_count > 0) typesArray.push(`${ticket.adult_count} Adult`);
@@ -234,6 +252,20 @@ window.viewTicketDetails = (ticketId) => {
   
   document.getElementById('modal-count').innerHTML = typesArray.length > 0 ? typesArray.join('<br>') : `${ticket.ticket_count} Person(s)`;
   document.getElementById('modal-amount').innerText = `₹${parseFloat(ticket.amount).toFixed(2)}`;
+  
+  const paymentStatusEl = document.getElementById('modal-payment-status');
+  paymentStatusEl.innerText = ticket.payment || 'Not Verified';
+  if (ticket.payment === 'Verified') paymentStatusEl.style.color = '#00ff66';
+  else if (ticket.payment === 'Rejected') paymentStatusEl.style.color = '#ff3366';
+  else paymentStatusEl.style.color = '#ffaa00';
+
+  const paymentActions = document.getElementById('payment-actions-container');
+  if (!ticket.payment || ticket.payment === 'Not Verified') {
+    paymentActions.style.display = 'flex';
+  } else {
+    paymentActions.style.display = 'none';
+  }
+
   document.getElementById('modal-date').innerText = new Date(ticket.booked_at).toLocaleString();
   
   const statusEl = document.getElementById('modal-attendance');
@@ -301,6 +333,115 @@ const handleSessionExpired = () => {
   showToast('Session expired. Please log in again.', 'error');
   updateView();
 };
+
+// Payment Verification Handlers
+const handlePaymentVerification = async (status) => {
+  if (!selectedTicketId) return;
+  try {
+    const response = await fetch('/api/admin/verify-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ ticketId: selectedTicketId, status })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      loadTickets(); // Reload list
+      closeModal(); // Close modal on success
+    } else {
+      showToast(data.error || 'Verification failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to backend service.', 'error');
+  }
+};
+
+window.quickVerifyPayment = async (ticketId, status) => {
+  try {
+    const response = await fetch('/api/admin/verify-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ ticketId, status })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      loadTickets(); // Reload list
+    } else {
+      showToast(data.error || 'Verification failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to backend service.', 'error');
+  }
+};
+
+document.getElementById('btn-modal-verify-payment').addEventListener('click', () => handlePaymentVerification('Verified'));
+document.getElementById('btn-modal-reject-payment').addEventListener('click', () => handlePaymentVerification('Rejected'));
+
+// Export to CSV
+document.getElementById('btn-export-excel').addEventListener('click', async () => {
+  try {
+    const searchVal = searchInput.value.trim();
+    const attendanceVal = filterSelect.value;
+    let url = `/api/admin/tickets?page=1&limit=all`;
+
+    if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
+    if (attendanceVal !== 'all') url += `&attendance=${attendanceVal}`;
+
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    
+    const data = await response.json();
+    if (data.success && data.tickets.length > 0) {
+      let csvContent = "Ticket ID,UTR,Category,Name,Email,Phone,Total Tickets,Adults,Couples,Kids,Amount,Payment Status,Attendance,Booked At\n";
+      
+      data.tickets.forEach(t => {
+        const row = [
+          t.ticket_id,
+          t.payment_id || '',
+          t.category || 'General',
+          `"${t.name}"`,
+          t.email,
+          t.phone,
+          t.ticket_count,
+          t.adult_count,
+          t.couples_count,
+          t.child_count,
+          t.amount,
+          t.payment || 'Not Verified',
+          t.attendance ? 'Checked In' : 'Pending',
+          new Date(t.booked_at).toLocaleString()
+        ];
+        csvContent += row.join(",") + "\n";
+      });
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const urlBlob = URL.createObjectURL(blob);
+      link.setAttribute("href", urlBlob);
+      link.setAttribute("download", `CrownBeatz_Tickets_${new Date().getTime()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showToast('Export successful!', 'success');
+    } else {
+      showToast('No tickets to export.', 'info');
+    }
+  } catch (err) {
+    console.error('Export error:', err);
+    showToast('Failed to export tickets.', 'error');
+  }
+});
 
 // Initialize view
 document.addEventListener('DOMContentLoaded', updateView);

@@ -142,7 +142,7 @@
       <div class="ticket-card" id="ticket-content">
         <div class="ticket-header">
           <h2 style="font-family: var(--font-title); font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase;">
-            CrownBeatz VIP Pass
+            CrownBeatz <span id="ticket-category-title" style="color: #ffd700;">VIP</span> Pass
           </h2>
           <span style="color: var(--color-neon-blue); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
             DJ Night 2026 - Dec 31
@@ -154,6 +154,14 @@
             <div class="detail-item">
               <span class="detail-label">Name</span>
               <span class="detail-value" id="ticket-name">Loading...</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Phone Number</span>
+              <span class="detail-value" id="ticket-phone">Loading...</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Category</span>
+              <span class="detail-value" id="ticket-category" style="color: #ffd700;">Loading...</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Ticket ID</span>
@@ -222,7 +230,17 @@
         }
 
         const ticket = data.ticket;
+        document.getElementById('ticket-category-title').innerText = ticket.category || 'VIP';
         document.getElementById('ticket-name').innerText = ticket.name;
+        document.getElementById('ticket-phone').innerText = ticket.phone;
+        document.getElementById('ticket-category').innerText = ticket.category || 'General';
+        
+        // Dynamic coloring for category in ticket
+        const catEl = document.getElementById('ticket-category');
+        if (ticket.category === 'Silver') catEl.style.color = 'silver';
+        else if (ticket.category === 'Gold') catEl.style.color = '#ffd700';
+        else catEl.style.color = '#fff';
+
         document.getElementById('ticket-id').innerText = ticket.ticket_id;
         document.getElementById('ticket-payment').innerText = ticket.payment_id;
         const typesArray = [];

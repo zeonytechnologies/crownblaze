@@ -25,6 +25,7 @@ const btnConfirmCheckin = document.getElementById('btn-confirm-checkin');
 // Modal Details elements
 const resName = document.getElementById('res-name');
 const resTicketId = document.getElementById('res-ticket-id');
+const resCategory = document.getElementById('res-category');
 const resCount = document.getElementById('res-count');
 const resTime = document.getElementById('res-time');
 const resScanTime = document.getElementById('res-scan-time');
@@ -44,13 +45,17 @@ const showToast = (message, type = 'info') => {
 };
 
 // Send request to backend to verify ticket
-const verifyTicket = async (verificationUrl) => {
+const verifyTicket = async (verificationUrl, options = {}) => {
   if (isProcessingScan) return;
   isProcessingScan = true;
 
   try {
     const response = await fetch(verificationUrl, {
-      headers: { 'Authorization': `Bearer ${adminToken}` }
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${adminToken}`
+      }
     });
 
     const data = await response.json();
@@ -79,6 +84,7 @@ const displayScanResult = (data) => {
     // Clear details
     resName.innerText = '-';
     resTicketId.innerText = '-';
+    resCategory.innerText = '-';
     resCount.innerText = '-';
     resTime.innerText = '-';
     resScanTime.innerText = '-';
@@ -94,6 +100,7 @@ const displayScanResult = (data) => {
     const ticket = data.ticket;
     resName.innerText = ticket.name;
     resTicketId.innerText = ticket.ticket_id;
+    resCategory.innerText = ticket.category || 'General';
     resCount.innerText = `${ticket.ticket_count} Person(s)`;
     resTime.innerText = new Date(ticket.booked_at).toLocaleString();
     resScanTime.innerText = ticket.checked_in_at ? new Date(ticket.checked_in_at).toLocaleString() : 'N/A';
@@ -109,6 +116,7 @@ const displayScanResult = (data) => {
     const ticket = data.ticket;
     resName.innerText = ticket.name;
     resTicketId.innerText = ticket.ticket_id;
+    resCategory.innerText = ticket.category || 'General';
     resCount.innerText = `${ticket.ticket_count} Person(s)`;
     resTime.innerText = new Date(ticket.booked_at).toLocaleString();
     resScanTime.innerText = '-';
@@ -257,8 +265,11 @@ btnManualVerify.addEventListener('click', () => {
   }
   
   // Format manual verify URL
-  const verifyUrl = `/api/admin/verify/${code}`;
-  verifyTicket(verifyUrl);
+  verifyTicket('/api/admin/verify-manual', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identifier: code })
+  });
 });
 
 // Enter key trigger for manual entry

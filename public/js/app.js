@@ -1,6 +1,6 @@
-const PRICE_COUPLES = 499;
-const PRICE_ADULT = 299;
-const PRICE_CHILD = 199;
+let PRICE_COUPLES = 549;
+let PRICE_ADULT = 349;
+let PRICE_CHILD = 0;
 
 // Countdown Timer logic
 const initCountdown = () => {
@@ -36,6 +36,7 @@ const initCountdown = () => {
 };
 
 // Quantity & Pricing Calculator
+window.ticketCategory = 'General';
 window.ticketCounts = { couples: 0, adult: 1, child: 0 };
 
 const initPricingCalculator = () => {
@@ -55,6 +56,37 @@ const initPricingCalculator = () => {
 
     document.getElementById('total-display').innerText = total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
+
+  const updateCategoryPrices = () => {
+    const category = document.getElementById('ticket-category').value;
+    window.ticketCategory = category;
+    
+    if (category === 'General') {
+      PRICE_COUPLES = 549;
+      PRICE_ADULT = 349;
+      document.getElementById('summary-category-features').innerText = 'Standing & dancing area provided.';
+    } else if (category === 'Silver') {
+      PRICE_COUPLES = 799;
+      PRICE_ADULT = 499;
+      document.getElementById('summary-category-features').innerText = 'Chair sitting with dancing area provided.';
+    } else if (category === 'Gold') {
+      PRICE_COUPLES = 899;
+      PRICE_ADULT = 599;
+      document.getElementById('summary-category-features').innerText = 'Premium seating with dancing area provided.';
+    }
+
+    document.getElementById('summary-category-name').innerText = category;
+    
+    // Update Labels
+    document.getElementById('lbl-price-couples').innerText = `₹${PRICE_COUPLES}`;
+    document.getElementById('lbl-price-adult').innerText = `₹${PRICE_ADULT}`;
+    document.getElementById('summary-price-couples').innerText = `₹${PRICE_COUPLES}`;
+    document.getElementById('summary-price-adult').innerText = `₹${PRICE_ADULT}`;
+    
+    updatePricing();
+  };
+
+  document.getElementById('ticket-category').addEventListener('change', updateCategoryPrices);
 
   const setupBtn = (type) => {
     document.getElementById(`qty-${type}-minus`).addEventListener('click', () => {

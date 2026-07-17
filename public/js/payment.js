@@ -1,13 +1,57 @@
-// Payment flow coordination using Cashfree Checkout
+// Payment flow coordination using Manual UPI
 const bookingForm = document.getElementById('booking-form');
 const btnSubmitBooking = document.getElementById('btn-submit-booking');
 
-// Initialize Cashfree
-const cashfree = Cashfree({
-    mode: "sandbox",
-});
+const upiModal = document.getElementById('upi-modal');
+const btnCancelUpi = document.getElementById('btn-cancel-upi');
+const btnVerifyUpi = document.getElementById('btn-verify-upi');
+const upiUtrInput = document.getElementById('upi-utr');
+const upiAmountDisplay = document.getElementById('upi-amount-display');
+const upiDeeplinkBtn = document.getElementById('upi-deeplink-btn');
+const upiQrcodeDiv = document.getElementById('upi-qrcode');
 
-const handleBookingSubmit = async (e) => {
+let currentBookingData = null;
+let currentUpiUrl = '';
+let qrcodeInstance = null;
+
+// The Target UPI ID
+const UPI_ID = '8124872367@yes'; 
+const PAYEE_NAME = 'CrownBeatz';
+
+const openUpiModal = (amount) => {
+  upiAmountDisplay.textContent = amount;
+  
+  // Construct the standard UPI Deep link intent URL
+  currentUpiUrl = `upi://pay?pa=${UPI_ID}&pn=${PAYEE_NAME}&am=${amount}&cu=INR`;
+  
+  // Update the Mobile Deeplink Button
+  upiDeeplinkBtn.href = currentUpiUrl;
+
+  // Clear previous QR code if any
+  upiQrcodeDiv.innerHTML = '';
+  
+  // Generate New QR Code
+  qrcodeInstance = new QRCode(upiQrcodeDiv, {
+    text: currentUpiUrl,
+    width: 200,
+    height: 200,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+
+  upiUtrInput.value = '';
+  upiModal.classList.add('active');
+};
+
+const closeUpiModal = () => {
+  upiModal.classList.remove('active');
+  currentBookingData = null;
+};
+
+btnCancelUpi.addEventListener('click', closeUpiModal);
+
+const handleBookingSubmit = (e) => {
   e.preventDefault();
 
   const name = document.getElementById('full-name').value.trim();
@@ -16,6 +60,7 @@ const handleBookingSubmit = async (e) => {
   const couplesCount = window.ticketCounts.couples;
   const adultCount = window.ticketCounts.adult;
   const childCount = window.ticketCounts.child;
+  const category = window.ticketCategory || 'General';
   
   const totalTickets = couplesCount + adultCount + childCount;
 
@@ -29,89 +74,60 @@ const handleBookingSubmit = async (e) => {
     return;
   }
 
+  // Calculate amount on frontend (Backend will recalculate to be safe)
+  let PRICE_COUPLES = 549;
+  let PRICE_ADULT = 349;
+  if (category === 'Silver') { PRICE_COUPLES = 799; PRICE_ADULT = 499; }
+  else if (category === 'Gold') { PRICE_COUPLES = 899; PRICE_ADULT = 599; }
+  const PRICE_CHILD = 0;
+  
+  const totalAmount = (couplesCount * PRICE_COUPLES) + (adultCount * PRICE_ADULT) + (childCount * PRICE_CHILD);
+
+  currentBookingData = { name, email, phone, category, couplesCount, adultCount, childCount };
+  
+  openUpiModal(totalAmount);
+};
+
+btnVerifyUpi.addEventListener('click', async () => {
+  const transactionId = upiUtrInput.value.trim();
+  
+  if (!transactionId || transactionId.length < 10) {
+    showToast('Please enter a valid Transaction ID / UTR.', 'error');
+    return;
+  }
+
+  if (!currentBookingData) return;
+
   try {
-    btnSubmitBooking.disabled = true;
+    btnVerifyUpi.disabled = true;
     showLoader(true);
 
-    // 1. Create Cashfree order session
-    const orderResponse = await fetch('/api/payment/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, couplesCount, adultCount, childCount })
-    });
-
-    const orderData = await orderResponse.json();
-    if (!orderData.success) {
-      showLoader(false);
-      btnSubmitBooking.disabled = false;
-      showToast(orderData.error || 'Failed to create order. Try again.', 'error');
-      return;
-    }
-
-    // Hide loader before triggering Cashfree modal
-    showLoader(false);
-
-    // 2. Open Cashfree Drop-in Checkout
-    let checkoutOptions = {
-      paymentSessionId: orderData.payment_session_id,
-      redirectTarget: "_modal",
+    const payload = {
+      ...currentBookingData,
+      transaction_id: transactionId
     };
 
-    cashfree.checkout(checkoutOptions).then(async (result) => {
-      if (result.error) {
-        btnSubmitBooking.disabled = false;
-        showToast('Payment window closed or encountered an error.', 'error');
-        console.error("Cashfree Checkout Error:", result.error);
-        return;
-      }
-      
-      if (result.redirect) {
-        console.log("Payment will be redirected");
-        return;
-      }
-      
-      if (result.paymentDetails) {
-        // Payment was successful in UI! Now verify with our backend.
-        showLoader(true);
-        try {
-          const verifyResponse = await fetch('/api/payment/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              order_id: orderData.order_id,
-              name,
-              email,
-              phone,
-              couplesCount,
-              adultCount,
-              childCount
-            })
-          });
-
-          const verifyData = await verifyResponse.json();
-          if (verifyData.success) {
-            // Redirect to success route
-            window.location.href = `/success.html?ticketId=${verifyData.ticketId}`;
-          } else {
-            showLoader(false);
-            btnSubmitBooking.disabled = false;
-            showToast(verifyData.error || 'Backend verification failed.', 'error');
-          }
-        } catch (err) {
-          console.error('Verification error:', err);
-          showLoader(false);
-          btnSubmitBooking.disabled = false;
-          showToast('Payment verify failed. Please contact support.', 'error');
-        }
-      }
+    const verifyResponse = await fetch('/api/payment/submit-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
+    const verifyData = await verifyResponse.json();
+    
+    if (verifyData.success) {
+      window.location.href = `/success.html?ticketId=${verifyData.ticketId}`;
+    } else {
+      showLoader(false);
+      btnVerifyUpi.disabled = false;
+      showToast(verifyData.error || 'Booking submission failed.', 'error');
+    }
   } catch (error) {
     console.error('Booking submission error:', error);
     showLoader(false);
-    btnSubmitBooking.disabled = false;
+    btnVerifyUpi.disabled = false;
     showToast('Server connection failed. Try again.', 'error');
   }
-};
+});
 
 bookingForm.addEventListener('submit', handleBookingSubmit);

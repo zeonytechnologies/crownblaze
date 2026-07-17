@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (ticketData) => {
-  const { name, email, ticketId, amount, qrData, couples, adults, children } = ticketData;
+  const { name, email, ticketId, amount, qrData, category, couples, adults, children } = ticketData;
 
   // Extract base64 part from the data URI
   const base64Data = qrData.replace(/^data:image\/png;base64,/, "");
@@ -39,6 +39,7 @@ const sendTicketEmail = async (ticketData) => {
           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #333;">
             <h3 style="margin-top: 0; color: #aa00ff;">Ticket Breakdown</h3>
             <p style="margin: 5px 0; color: #ccc;"><strong>Ticket ID:</strong> ${ticketId}</p>
+            <p style="margin: 5px 0; color: #00ff66;"><strong>Category:</strong> ${category || 'General'} Pass</p>
             ${couples > 0 ? `<p style="margin: 5px 0; color: #ccc;">👫 Couples Pass: ${couples}</p>` : ''}
             ${adults > 0 ? `<p style="margin: 5px 0; color: #ccc;">🧑 Adult Pass: ${adults}</p>` : ''}
             ${children > 0 ? `<p style="margin: 5px 0; color: #ccc;">🧒 Child Pass: ${children}</p>` : ''}
