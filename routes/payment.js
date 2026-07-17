@@ -11,14 +11,11 @@ router.post('/submit-booking', async (req, res) => {
       name,
       email,
       phone,
-      category,
-      couplesCount,
-      adultCount,
-      childCount,
+      ticketCounts,
       transaction_id
     } = req.body;
 
-    if (!transaction_id || !name || !email || !phone) {
+    if (!transaction_id || !name || !email || !phone || !ticketCounts) {
       return res.status(400).json({ success: false, error: 'Missing booking details or Transaction ID.' });
     }
 
@@ -42,20 +39,45 @@ router.post('/submit-booking', async (req, res) => {
     const count = countRes.count || 0;
     const ticketId = `CB-2026-${String(count + 1).padStart(6, '0')}`;
 
-    // Calculate final stored amount
-    const ticketCategory = category || 'General';
-    let PRICE_COUPLES = 549;
-    let PRICE_ADULT = 349;
-    if (ticketCategory === 'Silver') { PRICE_COUPLES = 799; PRICE_ADULT = 499; }
-    else if (ticketCategory === 'Gold') { PRICE_COUPLES = 899; PRICE_ADULT = 599; }
-    const PRICE_CHILD = 0;
+    // Calculate final stored amount server-side to prevent tampering
+    const ticketPrices = {
+      general: { couples: 549, adult: 349, child: 0 },
+      silver: { couples: 799, adult: 499, child: 0 },
+      gold: { couples: 899, adult: 599, child: 0 }
+    };
 
-    const countCouples = parseInt(couplesCount, 10) || 0;
-    const countAdult = parseInt(adultCount, 10) || 0;
-    const countChild = parseInt(childCount, 10) || 0;
+    let totalAmount = 0;
+    let totalTicketsNum = 0;
+    let globalCouples = 0;
+    let globalAdult = 0;
+    let globalChild = 0;
     
-    const ticketsNum = (countCouples * 2) + countAdult + countChild;
-    const totalAmount = (countCouples * PRICE_COUPLES) + (countAdult * PRICE_ADULT) + (countChild * PRICE_CHILD);
+    let categoryParts = [];
+
+    const cats = ['general', 'silver', 'gold'];
+    const types = ['couples', 'adult', 'child'];
+    
+    cats.forEach(cat => {
+      let catDesc = [];
+      types.forEach(type => {
+        const qty = parseInt(ticketCounts[cat][type], 10) || 0;
+        if (qty > 0) {
+          totalAmount += ticketPrices[cat][type] * qty;
+          totalTicketsNum += (type === 'couples' ? qty * 2 : qty);
+          
+          if (type === 'couples') globalCouples += qty;
+          if (type === 'adult') globalAdult += qty;
+          if (type === 'child') globalChild += qty;
+          
+          catDesc.push(`${qty} ${type.charAt(0).toUpperCase() + type.slice(1)}`);
+        }
+      });
+      if (catDesc.length > 0) {
+        categoryParts.push(`${cat.charAt(0).toUpperCase() + cat.slice(1)} (${catDesc.join(', ')})`);
+      }
+    });
+
+    const combinedCategoryStr = categoryParts.join(' | ') || 'General';
 
     const qrData = await generateQRCode(ticketId);
 
@@ -65,16 +87,17 @@ router.post('/submit-booking', async (req, res) => {
       name,
       email,
       phone,
-      category: ticketCategory,
-      ticket_count: ticketsNum,
-      couples_count: countCouples,
-      adult_count: countAdult,
-      child_count: countChild,
+      category: combinedCategoryStr,
+      ticket_count: totalTicketsNum,
+      couples_count: globalCouples,
+      adult_count: globalAdult,
+      child_count: globalChild,
       amount: totalAmount,
       payment_id: transaction_id,
       order_id: `upi_order_${Date.now()}`,
       qr_data: qrData,
-      attendance: false
+      attendance: false,
+      booking_details: ticketCounts
     }]);
 
     if (dbError) {
@@ -90,10 +113,8 @@ router.post('/submit-booking', async (req, res) => {
         ticketId,
         amount: totalAmount,
         qrData,
-        category: ticketCategory,
-        couples: countCouples,
-        adults: countAdult,
-        children: countChild
+        combinedCategoryStr,
+        ticketCounts
       });
     } catch (emailErr) {
       console.error('Failed to send booking email:', emailErr);

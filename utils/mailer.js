@@ -9,10 +9,27 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (ticketData) => {
-  const { name, email, ticketId, amount, qrData, category, couples, adults, children } = ticketData;
+  const { name, email, ticketId, amount, qrData, combinedCategoryStr, ticketCounts } = ticketData;
 
   // Extract base64 part from the data URI
   const base64Data = qrData.replace(/^data:image\/png;base64,/, "");
+
+  // Generate dynamic breakdown HTML for email
+  let breakdownHtml = '';
+  if (ticketCounts) {
+    const cats = ['general', 'silver', 'gold'];
+    const types = ['couples', 'adult', 'child'];
+    cats.forEach(cat => {
+      types.forEach(type => {
+        const qty = parseInt(ticketCounts[cat][type], 10) || 0;
+        if (qty > 0) {
+          const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
+          const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+          breakdownHtml += `<p style="margin: 5px 0; color: #ccc;">🎫 ${catName} ${typeName} Pass: ${qty}</p>`;
+        }
+      });
+    });
+  }
 
   const mailOptions = {
     from: `"CrownBeatz" <${process.env.SMTP_EMAIL}>`,
@@ -31,18 +48,17 @@ const sendTicketEmail = async (ticketData) => {
           
           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #333;">
             <h3 style="margin-top: 0; color: #aa00ff;">Event Schedule</h3>
-            <p style="margin: 5px 0; color: #ccc;">📅 <strong>Date:</strong> December 31, 2026</p>
-            <p style="margin: 5px 0; color: #ccc;">⏰ <strong>Time:</strong> 08:00 PM onwards</p>
-            <p style="margin: 5px 0; color: #ccc;">📍 <strong>Venue:</strong> Neon Arena, Phase 2, Bangalore</p>
+            <p style="margin: 5px 0; color: #ccc;">📅 <strong>Date:</strong> August 1st Week</p>
+            <p style="margin: 5px 0; color: #ccc;">⏰ <strong>Time:</strong> 06:30 PM onwards</p>
+            <p style="margin: 5px 0; color: #ccc;">📍 <strong>Venue:</strong> Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri</p>
           </div>
 
           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #333;">
             <h3 style="margin-top: 0; color: #aa00ff;">Ticket Breakdown</h3>
             <p style="margin: 5px 0; color: #ccc;"><strong>Ticket ID:</strong> ${ticketId}</p>
-            <p style="margin: 5px 0; color: #00ff66;"><strong>Category:</strong> ${category || 'General'} Pass</p>
-            ${couples > 0 ? `<p style="margin: 5px 0; color: #ccc;">👫 Couples Pass: ${couples}</p>` : ''}
-            ${adults > 0 ? `<p style="margin: 5px 0; color: #ccc;">🧑 Adult Pass: ${adults}</p>` : ''}
-            ${children > 0 ? `<p style="margin: 5px 0; color: #ccc;">🧒 Child Pass: ${children}</p>` : ''}
+            <p style="margin: 5px 0; color: #00ff66;"><strong>Category:</strong> ${combinedCategoryStr || 'General Pass'}</p>
+            <hr style="border-color: #333; margin: 10px 0;">
+            ${breakdownHtml}
           </div>
           
           <div style="text-align: center; margin: 30px 0;">

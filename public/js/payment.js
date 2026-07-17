@@ -69,12 +69,20 @@ const handleBookingSubmit = (e) => {
   const name = document.getElementById('full-name').value.trim();
   const email = document.getElementById('email-address').value.trim();
   const phone = document.getElementById('phone-number').value.trim();
-  const couplesCount = window.ticketCounts.couples;
-  const adultCount = window.ticketCounts.adult;
-  const childCount = window.ticketCounts.child;
-  const category = window.ticketCategory || 'General';
   
-  const totalTickets = couplesCount + adultCount + childCount;
+  let totalTickets = 0;
+  let totalAmount = 0;
+  
+  const cats = ['general', 'silver', 'gold'];
+  const types = ['couples', 'adult', 'child'];
+  
+  cats.forEach(cat => {
+    types.forEach(type => {
+      const qty = window.ticketCounts[cat][type];
+      totalTickets += qty;
+      totalAmount += (window.ticketPrices[cat][type] * qty);
+    });
+  });
 
   // Frontend Validations
   if (totalTickets === 0) {
@@ -86,16 +94,14 @@ const handleBookingSubmit = (e) => {
     return;
   }
 
-  // Calculate amount on frontend (Backend will recalculate to be safe)
-  let PRICE_COUPLES = 549;
-  let PRICE_ADULT = 349;
-  if (category === 'Silver') { PRICE_COUPLES = 799; PRICE_ADULT = 499; }
-  else if (category === 'Gold') { PRICE_COUPLES = 899; PRICE_ADULT = 599; }
-  const PRICE_CHILD = 0;
-  
-  const totalAmount = (couplesCount * PRICE_COUPLES) + (adultCount * PRICE_ADULT) + (childCount * PRICE_CHILD);
-
-  currentBookingData = { name, email, phone, category, couplesCount, adultCount, childCount };
+  currentBookingData = { 
+    name, 
+    email, 
+    phone, 
+    ticketCounts: window.ticketCounts,
+    totalTickets,
+    totalAmount
+  };
   
   openUpiModal(totalAmount);
 };

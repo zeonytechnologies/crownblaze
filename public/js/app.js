@@ -1,99 +1,81 @@
-let PRICE_COUPLES = 549;
-let PRICE_ADULT = 349;
-let PRICE_CHILD = 0;
+// Global State for Multi-Category Pricing
+window.ticketPrices = {
+  general: { couples: 549, adult: 349, child: 0 },
+  silver: { couples: 799, adult: 499, child: 0 },
+  gold: { couples: 899, adult: 599, child: 0 }
+};
 
-// Countdown Timer logic removed
-// Quantity & Pricing Calculator
-window.ticketCategory = 'General';
-window.ticketCounts = { couples: 0, adult: 1, child: 0 };
+window.ticketCounts = {
+  general: { couples: 0, adult: 0, child: 0 },
+  silver: { couples: 0, adult: 0, child: 0 },
+  gold: { couples: 0, adult: 0, child: 0 }
+};
+
+window.updateQty = (category, type, delta) => {
+  const currentTotal = 
+    window.ticketCounts.general.couples + window.ticketCounts.general.adult + window.ticketCounts.general.child +
+    window.ticketCounts.silver.couples + window.ticketCounts.silver.adult + window.ticketCounts.silver.child +
+    window.ticketCounts.gold.couples + window.ticketCounts.gold.adult + window.ticketCounts.gold.child;
+    
+  if (delta > 0 && currentTotal >= 10) {
+    showToast('Maximum 10 tickets can be booked at a time.', 'error');
+    return;
+  }
+  
+  if (window.ticketCounts[category][type] + delta >= 0) {
+    window.ticketCounts[category][type] += delta;
+    if (window.updatePricing) window.updatePricing();
+  }
+};
 
 const initPricingCalculator = () => {
-  const updatePricing = () => {
-    document.getElementById('qty-couples-val').innerText = window.ticketCounts.couples;
-    document.getElementById('qty-adult-val').innerText = window.ticketCounts.adult;
-    document.getElementById('qty-child-val').innerText = window.ticketCounts.child;
+  window.updatePricing = () => {
+    let total = 0;
+    const breakdownList = document.getElementById('dynamic-breakdown-list');
+    if (breakdownList) breakdownList.innerHTML = '';
+    let hasItems = false;
+
+    const cats = ['general', 'silver', 'gold'];
+    const types = ['couples', 'adult', 'child'];
     
-    document.getElementById('summary-couples').innerText = window.ticketCounts.couples;
-    document.getElementById('summary-adult').innerText = window.ticketCounts.adult;
-    document.getElementById('summary-child').innerText = window.ticketCounts.child;
+    cats.forEach(cat => {
+      types.forEach(type => {
+        const qty = window.ticketCounts[cat][type];
+        // Update DOM labels
+        const el = document.getElementById(`qty-${cat}-${type}-val`);
+        if(el) el.innerText = qty;
 
-    const total = 
-      (window.ticketCounts.couples * PRICE_COUPLES) + 
-      (window.ticketCounts.adult * PRICE_ADULT) + 
-      (window.ticketCounts.child * PRICE_CHILD);
+        if (qty > 0) {
+          hasItems = true;
+          const price = window.ticketPrices[cat][type];
+          total += (price * qty);
+          
+          const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
+          const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+          
+          if (breakdownList) {
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.justifyContent = 'space-between';
+            row.style.marginBottom = '6px';
+            row.innerHTML = `<span>${catName} ${typeName} (${price > 0 ? '₹'+price : 'Free'})</span> <span style="color:#fff;">x ${qty}</span>`;
+            breakdownList.appendChild(row);
+          }
+        }
+      });
+    });
 
-    document.getElementById('total-display').innerText = total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const updateCategoryPrices = (category) => {
-    window.ticketCategory = category;
-    
-    if (category === 'General') {
-      PRICE_COUPLES = 549;
-      PRICE_ADULT = 349;
-      document.getElementById('summary-category-features').innerText = 'Standing & dancing area provided.';
-    } else if (category === 'Silver') {
-      PRICE_COUPLES = 799;
-      PRICE_ADULT = 499;
-      document.getElementById('summary-category-features').innerText = 'Chair sitting with dancing area provided.';
-    } else if (category === 'Gold') {
-      PRICE_COUPLES = 899;
-      PRICE_ADULT = 599;
-      document.getElementById('summary-category-features').innerText = 'Premium seating with dancing area provided.';
+    if (!hasItems && breakdownList) {
+      breakdownList.innerHTML = '<p>Please select tickets to view breakdown.</p>';
     }
 
-    document.getElementById('summary-category-name').innerText = category;
-    
-    // Update Labels
-    document.getElementById('lbl-price-couples').innerText = `₹${PRICE_COUPLES}`;
-    document.getElementById('lbl-price-adult').innerText = `₹${PRICE_ADULT}`;
-    document.getElementById('summary-price-couples').innerText = `₹${PRICE_COUPLES}`;
-    document.getElementById('summary-price-adult').innerText = `₹${PRICE_ADULT}`;
-    
-    updatePricing();
+    const totalDisplay = document.getElementById('total-display');
+    if (totalDisplay) {
+      totalDisplay.innerText = total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
   };
 
-  // Category buttons click handler
-  const categoryBtns = document.querySelectorAll('.category-btn');
-  categoryBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      // Remove active class from all
-      categoryBtns.forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'transparent';
-      });
-      // Add active to clicked
-      e.target.classList.add('active');
-      e.target.style.background = ''; // reset to default glow style
-      
-      const category = e.target.getAttribute('data-val');
-      updateCategoryPrices(category);
-    });
-  });
-
-  const setupBtn = (type) => {
-    document.getElementById(`qty-${type}-minus`).addEventListener('click', () => {
-      if (window.ticketCounts[type] > 0) {
-        window.ticketCounts[type]--;
-        updatePricing();
-      }
-    });
-    document.getElementById(`qty-${type}-plus`).addEventListener('click', () => {
-      const totalTickets = window.ticketCounts.couples + window.ticketCounts.adult + window.ticketCounts.child;
-      if (totalTickets < 10) {
-        window.ticketCounts[type]++;
-        updatePricing();
-      } else {
-        showToast('Maximum 10 tickets can be booked at a time.', 'error');
-      }
-    });
-  };
-
-  setupBtn('couples');
-  setupBtn('adult');
-  setupBtn('child');
-
-  updatePricing();
+  window.updatePricing();
 };
 
 // FAB Scroll Logic
