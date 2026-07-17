@@ -82,11 +82,32 @@ router.post('/submit-booking', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Failed to save booking. Please contact support with your UTR.' });
     }
 
-    // Email is NOT sent here anymore. It will be sent via Admin approval.
+    // Send the email immediately after booking!
+    try {
+      await sendTicketEmail({
+        name,
+        email,
+        ticketId,
+        amount: totalAmount,
+        qrData,
+        category: ticketCategory,
+        couples: countCouples,
+        adults: countAdult,
+        children: countChild
+      });
+    } catch (emailErr) {
+      console.error('Failed to send booking email:', emailErr);
+      return res.json({ 
+        success: true, 
+        ticketId, 
+        message: `Booking successful, BUT email failed to send. Error: ${emailErr.message || 'Unknown Mail Error'}`
+      });
+    }
 
     res.json({
       success: true,
-      ticketId
+      ticketId,
+      message: 'Booking successful and ticket email sent!'
     });
 
   } catch (error) {

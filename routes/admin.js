@@ -445,27 +445,6 @@ router.post('/verify-payment', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Failed to update payment status.' });
     }
 
-    // If verified, send the email!
-    if (status === 'Verified') {
-      try {
-        await sendTicketEmail({
-          name: ticket.name,
-          email: ticket.email,
-          ticketId: ticket.ticket_id,
-          amount: ticket.amount,
-          qrData: ticket.qr_data,
-          category: ticket.category,
-          couples: ticket.couples_count,
-          adults: ticket.adult_count,
-          children: ticket.child_count
-        });
-      } catch (emailErr) {
-        console.error('Failed to send verified ticket email:', emailErr);
-        // We still return success since payment was verified, but flag the email error
-        return res.json({ success: true, message: 'Payment verified, but email failed to send.' });
-      }
-    }
-
     res.json({ success: true, message: `Payment successfully marked as ${status}.` });
 
   } catch (error) {

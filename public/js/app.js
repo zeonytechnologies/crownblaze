@@ -2,39 +2,7 @@ let PRICE_COUPLES = 549;
 let PRICE_ADULT = 349;
 let PRICE_CHILD = 0;
 
-// Countdown Timer logic
-const initCountdown = () => {
-  // Set date to December 31, 2026 20:00:00
-  const eventDate = new Date('Dec 31, 2026 20:00:00').getTime();
-
-  const updateTimer = () => {
-    const now = new Date().getTime();
-    const diff = eventDate - now;
-
-    if (diff <= 0) {
-      document.getElementById('days').innerText = '00';
-      document.getElementById('hours').innerText = '00';
-      document.getElementById('minutes').innerText = '00';
-      document.getElementById('seconds').innerText = '00';
-      clearInterval(timerInterval);
-      return;
-    }
-
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-    document.getElementById('days').innerText = String(d).padStart(2, '0');
-    document.getElementById('hours').innerText = String(h).padStart(2, '0');
-    document.getElementById('minutes').innerText = String(m).padStart(2, '0');
-    document.getElementById('seconds').innerText = String(s).padStart(2, '0');
-  };
-
-  updateTimer();
-  const timerInterval = setInterval(updateTimer, 1000);
-};
-
+// Countdown Timer logic removed
 // Quantity & Pricing Calculator
 window.ticketCategory = 'General';
 window.ticketCounts = { couples: 0, adult: 1, child: 0 };
@@ -57,8 +25,7 @@ const initPricingCalculator = () => {
     document.getElementById('total-display').innerText = total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  const updateCategoryPrices = () => {
-    const category = document.getElementById('ticket-category').value;
+  const updateCategoryPrices = (category) => {
     window.ticketCategory = category;
     
     if (category === 'General') {
@@ -86,7 +53,23 @@ const initPricingCalculator = () => {
     updatePricing();
   };
 
-  document.getElementById('ticket-category').addEventListener('change', updateCategoryPrices);
+  // Category buttons click handler
+  const categoryBtns = document.querySelectorAll('.category-btn');
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Remove active class from all
+      categoryBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+      });
+      // Add active to clicked
+      e.target.classList.add('active');
+      e.target.style.background = ''; // reset to default glow style
+      
+      const category = e.target.getAttribute('data-val');
+      updateCategoryPrices(category);
+    });
+  });
 
   const setupBtn = (type) => {
     document.getElementById(`qty-${type}-minus`).addEventListener('click', () => {
@@ -169,6 +152,5 @@ const showLoader = (show = true) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  initCountdown();
   initPricingCalculator();
 });

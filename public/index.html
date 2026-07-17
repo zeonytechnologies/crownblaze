@@ -48,26 +48,7 @@
       Join us for an electrifying night of heavy bass, custom lasers, and non-stop party anthems. The premium clubbing event of the year.
     </p>
 
-    <!-- Countdown Timer -->
-    <div class="countdown-container" id="countdown">
-      <div class="countdown-box">
-        <span class="countdown-value" id="days">00</span>
-        <span class="countdown-label">Days</span>
-      </div>
 
-      <div class="countdown-box">
-        <span class="countdown-value" id="hours">00</span>
-        <span class="countdown-label">Hours</span>
-      </div>
-      <div class="countdown-box">
-        <span class="countdown-value" id="minutes">00</span>
-        <span class="countdown-label">Mins</span>
-      </div>
-      <div class="countdown-box">
-        <span class="countdown-value" id="seconds">00</span>
-        <span class="countdown-label">Secs</span>
-      </div>
-    </div>
 
   <!-- Booking Section -->
   <section class="booking-section" id="booking">
@@ -95,12 +76,12 @@
             </div>
 
             <div class="form-group" style="margin-bottom: 24px;">
-              <label for="ticket-category" style="color: var(--color-neon-blue); font-weight: 600;">Ticket Category</label>
-              <select id="ticket-category" class="form-control" style="background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; appearance: auto;">
-                <option value="General" style="background: #121212;">General - Standing, Dancing Area</option>
-                <option value="Silver" style="background: #121212;">Silver - Chair Sitting, Dancing Area</option>
-                <option value="Gold" style="background: #121212;">Gold - Premium Seating, Dancing Area</option>
-              </select>
+              <label style="color: var(--color-neon-blue); font-weight: 600;">Ticket Category</label>
+              <div id="category-buttons" style="display: flex; gap: 10px; margin-top: 8px;">
+                <button type="button" class="btn-glow category-btn active" data-val="General" style="padding: 10px 15px; font-size: 0.9rem; flex: 1;">General</button>
+                <button type="button" class="btn-glow category-btn" data-val="Silver" style="padding: 10px 15px; font-size: 0.9rem; flex: 1; background: transparent; border: 1px solid var(--color-purple); color: #fff;">Silver</button>
+                <button type="button" class="btn-glow category-btn" data-val="Gold" style="padding: 10px 15px; font-size: 0.9rem; flex: 1; background: transparent; border: 1px solid var(--color-purple); color: #fff;">Gold</button>
+              </div>
             </div>
 
             <div style="margin-bottom: 24px; border: 1px solid var(--glass-border); padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.2);">
@@ -130,11 +111,11 @@
                 </div>
               </div>
 
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; justify-content: space-between; align-items: center;" id="child-pass-row">
                 <div>
                   <div style="font-weight: 600;">Child Pass</div>
-                  <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12)</div>
-                  <div style="font-size: 0.7rem; color: var(--color-text-secondary);">Must be accompanied by parents</div>
+                  <div style="font-size: 0.8rem; color: #00ff66;" id="child-pass-price">Free (Under 12)</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-secondary);" id="child-pass-desc">Must be accompanied by parents</div>
                 </div>
                 <div class="quantity-control">
                   <button type="button" class="qty-btn" id="qty-child-minus">-</button>
@@ -186,6 +167,37 @@
               <i class="fa-solid fa-check-circle"></i> Admin Verified via UTR
             </div>
           </div>
+
+          <!-- Event Passes inside right column -->
+          <div style="margin-top: 30px;">
+            <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--color-neon-blue);">Pass Perks</h3>
+            
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid #ccc; text-align: center;">
+              <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;">General Pass</div>
+              <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">Standing & Dancing Area</li>
+                <li>Children not allowed</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid silver; text-align: center;">
+              <div style="font-weight: bold; color: silver; font-size: 1.1rem; margin-bottom: 10px;">Silver VIP</div>
+              <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">Chair Seating Provided</li>
+                <li style="margin-bottom: 6px;">Access to Dancing Area</li>
+                <li>Free for Children under 12</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 3px solid #ffd700; text-align: center;">
+              <div style="font-weight: bold; color: #ffd700; font-size: 1.1rem; margin-bottom: 10px;">Gold Premium</div>
+              <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">Premium VIP Seating</li>
+                <li style="margin-bottom: 6px;">Access to Dancing Area</li>
+                <li>Free for Children under 12</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -198,46 +210,6 @@
     </div>
   </section>
 
-  <!-- About Section -->
-  <section class="about" id="about">
-    <div class="container">
-      <h2 class="section-title">About the Night</h2>
-      <div class="grid-about">
-        <div>
-          <h3 style="font-size: 1.8rem; margin-bottom: 20px; color: var(--color-neon-blue);">A Symphony of Lights & Sound</h3>
-          <p style="color: var(--color-text-secondary); margin-bottom: 24px;">
-            Get ready to experience high-octane live DJ performances, pounding EDM tracks, custom Bollywood Mashups, and commercial hits that will keep you dancing all night. We are pulling out all the stops to deliver a festival-scale sound system, custom laser configurations, smoke effects, and a high-energy dance floor atmosphere.
-          </p>
-          <div class="about-features">
-            <div class="feature-tag"><i class="fa-solid fa-volume-high"></i> Premium Sound System</div>
-            <div class="feature-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Laser & Smoke FX</div>
-            <div class="feature-tag"><i class="fa-solid fa-users"></i> High Energy Crowd</div>
-            <div class="feature-tag"><i class="fa-solid fa-champagne-glasses"></i> VIP Lounge Zone</div>
-          </div>
-        </div>
-        <div class="glass-card">
-          <h3 style="font-size: 1.4rem; margin-bottom: 16px; color: #fff;">Event Highlights</h3>
-          <ul style="list-style: none; color: var(--color-text-secondary);">
-            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
-              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Non-stop 6-Hour DJ Marathon
-            </li>
-            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
-              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Dedicated Photography & Selfie Zone
-            </li>
-            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
-              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Curated Food & Beverage Stalls
-            </li>
-            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
-              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Secured Entry and Free Parking
-            </li>
-            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
-              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Exclusive CrownBeatz Merchandise counter
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- DJ Section -->
   <section class="dj-section">
@@ -265,49 +237,17 @@
           <div class="social-links">
             <a href="https://www.instagram.com/dj_harly?igsh=d2xhanR4aWV2YXB3" target="_blank" class="social-link"><i class="fa-brands fa-instagram"></i></a>
           </div>
+
+          <!-- Video Embed -->
+          <div style="margin-top: 30px; border-radius: 12px; overflow: hidden; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--glass-border);">
+            <video src="/images/video.mp4" width="100%" autoplay loop muted playsinline style="display: block;"></video>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Event Passes Explanation Section -->
-  <section class="passes-section" style="background: rgba(123, 44, 191, 0.05); border-top: 1px solid rgba(123, 44, 191, 0.2); border-bottom: 1px solid rgba(123, 44, 191, 0.2);">
-    <div class="container">
-      <h2 class="section-title">Event Passes</h2>
-      <div class="genre-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-        
-        <div class="genre-card" style="border-top: 3px solid #ccc; text-align: left;">
-          <h3 class="genre-title" style="margin-bottom: 10px;">General Pass</h3>
-          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Standard access with full vibes.</p>
-          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
-            <li style="margin-bottom: 5px;">Standing & Dancing Area</li>
-            <li>Free for Children under 12</li>
-          </ul>
-        </div>
 
-        <div class="genre-card" style="border-top: 3px solid silver; text-align: left;">
-          <h3 class="genre-title" style="color: silver; margin-bottom: 10px;">Silver VIP</h3>
-          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Upgraded experience with comfort.</p>
-          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
-            <li style="margin-bottom: 5px;">Chair Seating Provided</li>
-            <li style="margin-bottom: 5px;">Access to Dancing Area</li>
-            <li>Free for Children under 12</li>
-          </ul>
-        </div>
-
-        <div class="genre-card" style="border-top: 3px solid #ffd700; text-align: left;">
-          <h3 class="genre-title" style="color: #ffd700; margin-bottom: 10px;">Gold Premium</h3>
-          <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 15px;">The ultimate VIP treatment.</p>
-          <ul style="color: #fff; font-size: 0.9rem; line-height: 1.6; padding-left: 20px;">
-            <li style="margin-bottom: 5px;">Premium VIP Seating</li>
-            <li style="margin-bottom: 5px;">Access to Dancing Area</li>
-            <li>Free for Children under 12</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
 
   <!-- Music Experience Section -->
@@ -376,6 +316,47 @@
     </div>
   </section>
 
+  <!-- About Section Moved Here -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">About the Night</h2>
+      <div class="grid-about">
+        <div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 20px; color: var(--color-neon-blue); display: none;">A Symphony of Lights & Sound</h3>
+          <p style="color: var(--color-text-secondary); margin-bottom: 24px; display: none;">
+            Get ready to experience high-octane live DJ performances, pounding EDM tracks, custom Bollywood Mashups, and commercial hits that will keep you dancing all night. We are pulling out all the stops to deliver a festival-scale sound system, custom laser configurations, smoke effects, and a high-energy dance floor atmosphere.
+          </p>
+          <div class="about-features" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div class="feature-tag"><i class="fa-solid fa-volume-high"></i> Premium Sound System</div>
+            <div class="feature-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Laser & Smoke FX</div>
+            <div class="feature-tag"><i class="fa-solid fa-users"></i> High Energy Crowd</div>
+            <div class="feature-tag" style="display: none;"><i class="fa-solid fa-champagne-glasses"></i> VIP Lounge Zone</div>
+          </div>
+        </div>
+        <div class="glass-card" style="display: none;">
+          <h3 style="font-size: 1.4rem; margin-bottom: 16px; color: #fff;">Event Highlights</h3>
+          <ul style="list-style: none; color: var(--color-text-secondary);">
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Non-stop 6-Hour DJ Marathon
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Dedicated Photography & Selfie Zone
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Curated Food & Beverage Stalls
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Secured Entry and Free Parking
+            </li>
+            <li style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+              <i class="fa-solid fa-check" style="color: var(--color-neon-blue)"></i> Exclusive CrownBeatz Merchandise counter
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer>
     <div class="container footer-grid">
@@ -403,6 +384,7 @@
     </div>
     <div class="footer-bottom">
       <p>&copy; 2026 CrownBeatz. All Rights Reserved. Crafted for EDM Lovers.</p>
+      <p style="margin-top: 5px; font-size: 0.85rem; color: #888;">Powered by <a href="https://www.zeonytechnologies.com" target="_blank" style="color: var(--color-neon-blue); text-decoration: none;">Zeony Technologies</a></p>
     </div>
   </footer>
 
