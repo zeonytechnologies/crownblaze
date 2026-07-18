@@ -49,7 +49,7 @@ const sendTicketEmail = (ticketData) => {
           <div style="text-align: center; margin: 30px 0;">
             <h3 style="color: #00f3ff; margin-bottom: 15px;">Your Entry QR Code</h3>
             <div style="background: #fff; padding: 15px; display: inline-block; border-radius: 10px;">
-              <img src="cid:ticket_qr" alt="QR Code" style="width: 200px; height: 200px; display: block;" />
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticketId}" alt="QR Code" style="width: 200px; height: 200px; display: block;" />
             </div>
             <p style="color: #888; font-size: 12px; margin-top: 15px;">Please present this QR code at the entrance.<br/>Do not share this QR code with anyone else.</p>
           </div>
@@ -74,14 +74,7 @@ const sendTicketEmail = (ticketData) => {
         }
       ],
       subject: `Your CrownBeatz Ticket - ${ticketId}`,
-      htmlContent: htmlContent,
-      attachment: [
-        {
-          content: base64Data,
-          name: "ticket_qr.png",
-          contentId: "ticket_qr"
-        }
-      ]
+      htmlContent: htmlContent
     });
 
     const options = {
