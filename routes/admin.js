@@ -90,7 +90,7 @@ router.get('/dashboard', async (req, res) => {
     // 1. Fetch total tickets sold (sum of ticket_count)
     const { data: sumData, error: sumError } = await supabase
       .from('tickets')
-      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count');
+      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count, booking_details');
 
     if (sumError) throw sumError;
 
@@ -114,10 +114,28 @@ router.get('/dashboard', async (req, res) => {
       totalTickets += ticketsCount;
       revenue += parseFloat(t.amount || 0);
       
-      const cat = t.category || 'General';
-      if (categoryStats[cat]) {
-        categoryStats[cat].adults += (t.adult_count || 0);
-        categoryStats[cat].couples += (t.couples_count || 0);
+      // Parse multi-category breakdown from JSON column
+      if (t.booking_details) {
+        if (t.booking_details.general) {
+          categoryStats.General.adults += parseInt(t.booking_details.general.adult) || 0;
+          categoryStats.General.couples += parseInt(t.booking_details.general.couples) || 0;
+        }
+        if (t.booking_details.silver) {
+          categoryStats.Silver.adults += parseInt(t.booking_details.silver.adult) || 0;
+          categoryStats.Silver.couples += parseInt(t.booking_details.silver.couples) || 0;
+        }
+        if (t.booking_details.gold) {
+          categoryStats.Gold.adults += parseInt(t.booking_details.gold.adult) || 0;
+          categoryStats.Gold.couples += parseInt(t.booking_details.gold.couples) || 0;
+        }
+      } else {
+        // Fallback for legacy records before booking_details existed
+        const cat = t.category || 'General';
+        // Check if cat is purely 'General', 'Silver', or 'Gold'
+        if (categoryStats[cat]) {
+          categoryStats[cat].adults += (t.adult_count || 0);
+          categoryStats[cat].couples += (t.couples_count || 0);
+        }
       }
       
       if (t.attendance) {
