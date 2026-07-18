@@ -105,25 +105,18 @@ router.post('/submit-booking', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Failed to save booking. Please contact support with your UTR.' });
     }
 
-    // Send the email immediately after booking!
-    try {
-      await sendTicketEmail({
-        name,
-        email,
-        ticketId,
-        amount: totalAmount,
-        qrData,
-        combinedCategoryStr,
-        ticketCounts
-      });
-    } catch (emailErr) {
-      console.error('Failed to send booking email:', emailErr);
-      return res.json({ 
-        success: true, 
-        ticketId, 
-        message: `Booking successful, BUT email failed to send. Error: ${emailErr.message || 'Unknown Mail Error'}`
-      });
-    }
+    // Send the email asynchronously in the background so it doesn't block the API response
+    sendTicketEmail({
+      name,
+      email,
+      ticketId,
+      amount: totalAmount,
+      qrData,
+      combinedCategoryStr,
+      ticketCounts
+    }).catch(emailErr => {
+      console.error('Background Email Error:', emailErr);
+    });
 
     res.json({
       success: true,
