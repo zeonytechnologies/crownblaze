@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+  port: process.env.SMTP_PORT || 587,
   secure: false, // Use STARTTLS on port 587 to bypass Render strict outbound blocks
   requireTLS: true,
   auth: {
-    user: process.env.SMTP_EMAIL,
+    user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
@@ -35,7 +35,7 @@ const sendTicketEmail = async (ticketData) => {
   }
 
   const mailOptions = {
-    from: `"CrownBeatz" <${process.env.SMTP_EMAIL}>`,
+    from: `"CrownBeatz" <${process.env.SMTP_FROM || process.env.SMTP_EMAIL}>`,
     to: email,
     subject: `Your CrownBeatz Ticket - ${ticketId}`,
     html: `
