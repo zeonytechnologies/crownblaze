@@ -4,8 +4,6 @@ const sendTicketEmail = (ticketData) => {
   return new Promise((resolve, reject) => {
     const { name, email, ticketId, amount, qrData, combinedCategoryStr, ticketCounts } = ticketData;
 
-    const base64Data = qrData.replace(/^data:image\/png;base64,/, "");
-
     let breakdownHtml = '';
     if (ticketCounts) {
       const cats = ['general', 'silver', 'gold'];
@@ -62,30 +60,38 @@ const sendTicketEmail = (ticketData) => {
       </div>
     `;
 
+    const textContent = `Welcome, ${name}!\n\nThank you for securing your spot at the most anticipated event of the year. Your payment of ₹${amount} was successful.\n\nTicket ID: ${ticketId}\n\nEvent Schedule:\nDate: August 1st Week\nTime: 06:30 PM onwards\nVenue: Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri\n\nPlease retain this ticket and present the QR code at the entrance.`;
+
     const payload = JSON.stringify({
-      sender: {
-        name: "CrownBeatz",
-        email: process.env.SMTP_FROM || "crownbeatzorg@gmail.com"
-      },
-      to: [
+      personalizations: [
         {
-          email: email,
-          name: name
+          to: [{ email: email, name: name }],
+          subject: `Your CrownBeatz Ticket - ${ticketId}`
         }
       ],
-      subject: `Your CrownBeatz Ticket - ${ticketId}`,
-      textContent: `Welcome, ${name}!\n\nThank you for securing your spot at the most anticipated event of the year. Your payment of ₹${amount} was successful.\n\nTicket ID: ${ticketId}\n\nEvent Schedule:\nDate: August 1st Week\nTime: 06:30 PM onwards\nVenue: Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri\n\nPlease retain this ticket and present the QR code at the entrance.`,
-      htmlContent: htmlContent
+      from: {
+        email: process.env.SMTP_FROM || "crownbeatzorg@gmail.com",
+        name: "CrownBeatz"
+      },
+      content: [
+        {
+          type: "text/plain",
+          value: textContent
+        },
+        {
+          type: "text/html",
+          value: htmlContent
+        }
+      ]
     });
 
     const options = {
-      hostname: 'api.brevo.com',
+      hostname: 'api.sendgrid.com',
       port: 443,
-      path: '/v3/smtp/email',
+      path: '/v3/mail/send',
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'api-key': process.env.BREVO_API_KEY,
+        'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload)
       }
@@ -95,18 +101,19 @@ const sendTicketEmail = (ticketData) => {
       let responseData = '';
       res.on('data', (chunk) => responseData += chunk);
       res.on('end', () => {
+        // SendGrid returns 202 Accepted on success
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          console.log('Brevo API Email Sent successfully!', responseData);
+          console.log('SendGrid API Email Sent successfully!');
           resolve(responseData);
         } else {
-          console.error('Brevo API Error:', responseData);
-          reject(new Error(`Brevo HTTP Error: ${res.statusCode} ${responseData}`));
+          console.error('SendGrid API Error:', responseData);
+          reject(new Error(`SendGrid HTTP Error: ${res.statusCode} ${responseData}`));
         }
       });
     });
 
     req.on('error', (e) => {
-      console.error('Brevo Request Error:', e);
+      console.error('SendGrid Request Error:', e);
       reject(e);
     });
 
