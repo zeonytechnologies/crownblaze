@@ -74,6 +74,7 @@ const sendTicketEmail = (ticketData) => {
         }
       ],
       subject: `Your CrownBeatz Ticket - ${ticketId}`,
+      textContent: `Welcome, ${name}!\n\nThank you for securing your spot at the most anticipated event of the year. Your payment of ₹${amount} was successful.\n\nTicket ID: ${ticketId}\n\nEvent Schedule:\nDate: August 1st Week\nTime: 06:30 PM onwards\nVenue: Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri\n\nPlease retain this ticket and present the QR code at the entrance.`,
       htmlContent: htmlContent
     });
 
