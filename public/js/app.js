@@ -22,6 +22,14 @@ window.updateQty = (category, type, delta) => {
     return;
   }
   
+  if (type === 'child' && delta > 0) {
+    const totalChildren = window.ticketCounts.general.child + window.ticketCounts.silver.child + window.ticketCounts.gold.child;
+    if (totalChildren >= 2) {
+      showToast('Maximum 2 children allowed per booking.', 'error');
+      return;
+    }
+  }
+  
   if (window.ticketCounts[category][type] + delta >= 0) {
     window.ticketCounts[category][type] += delta;
     if (window.updatePricing) window.updatePricing();

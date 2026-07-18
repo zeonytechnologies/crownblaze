@@ -7,7 +7,7 @@ const btnCancelUpi = document.getElementById('btn-cancel-upi');
 const btnVerifyUpi = document.getElementById('btn-verify-upi');
 const upiUtrInput = document.getElementById('upi-utr');
 const upiAmountDisplay = document.getElementById('upi-amount-display');
-const upiDeeplinkBtn = document.getElementById('upi-deeplink-btn');
+const upiDownloadBtn = document.getElementById('upi-download-qr-btn');
 const upiQrcodeDiv = document.getElementById('upi-qrcode');
 
 let currentBookingData = null;
@@ -24,9 +24,6 @@ const openUpiModal = (amount) => {
   // Construct the standard UPI Deep link intent URL
   const formattedAmount = Number(amount).toFixed(2);
   currentUpiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${formattedAmount}&cu=INR`;
-  
-  // Update the Mobile Deeplink Button
-  upiDeeplinkBtn.href = currentUpiUrl;
 
   // Clear previous QR code if any
   upiQrcodeDiv.innerHTML = '';
@@ -44,6 +41,19 @@ const openUpiModal = (amount) => {
   upiUtrInput.value = '';
   upiModal.classList.add('active');
 };
+
+upiDownloadBtn?.addEventListener('click', () => {
+  const canvas = upiQrcodeDiv.querySelector('canvas');
+  if (canvas) {
+    const dataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'CrownBeatz-QR-Code.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+});
 
 const closeUpiModal = () => {
   upiModal.classList.remove('active');
@@ -73,6 +83,8 @@ const handleBookingSubmit = (e) => {
   
   let totalTickets = 0;
   let totalAmount = 0;
+  let totalAdultsCouples = 0;
+  let totalChildren = 0;
   
   const cats = ['general', 'silver', 'gold'];
   const types = ['couples', 'adult', 'child'];
@@ -82,12 +94,18 @@ const handleBookingSubmit = (e) => {
       const qty = window.ticketCounts[cat][type];
       totalTickets += qty;
       totalAmount += (window.ticketPrices[cat][type] * qty);
+      if (type === 'child') totalChildren += qty;
+      else totalAdultsCouples += qty;
     });
   });
 
   // Frontend Validations
   if (totalTickets === 0) {
     showToast('Please select at least one ticket.', 'error');
+    return;
+  }
+  if (totalChildren > 0 && totalAdultsCouples === 0) {
+    showToast('At least one Adult or Couples pass is required to book a Child pass.', 'error');
     return;
   }
   if (!name || !email || !phone) {

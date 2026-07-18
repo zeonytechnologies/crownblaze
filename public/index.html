@@ -104,7 +104,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12)</div>
+                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('general', 'child', -1)">-</button>
@@ -142,7 +142,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12)</div>
+                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('silver', 'child', -1)">-</button>
@@ -180,7 +180,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12)</div>
+                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('gold', 'child', -1)">-</button>
@@ -232,7 +232,7 @@
               <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;">General Pass</div>
               <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
                 <li style="margin-bottom: 6px;">Standing & Dancing Area</li>
-                <li>Free for Children under 12 (Separate space for children)</li>
+                <li>Free for Children under 12 age (Separate space for children)</li>
               </ul>
             </div>
 
@@ -241,7 +241,7 @@
               <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
                 <li style="margin-bottom: 6px;">Chair Seating Provided</li>
                 <li style="margin-bottom: 6px;">Access to Dancing Area</li>
-                <li>Free for Children under 12 (Separate space for children)</li>
+                <li>Free for Children under 12 age (Separate space for children)</li>
               </ul>
             </div>
 
@@ -250,7 +250,7 @@
               <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
                 <li style="margin-bottom: 6px;">Premium VIP Seating</li>
                 <li style="margin-bottom: 6px;">Access to Dancing Area</li>
-                <li>Free for Children under 12 (Separate space for children)</li>
+                <li>Free for Children under 12 age (Separate space for children)</li>
               </ul>
             </div>
           </div>
@@ -418,6 +418,9 @@
         <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">CROWN<span>BEATZ</span></a>
         <p>The premium music event experience. Sound, lights, and memories that last a lifetime.</p>
         <p style="margin-bottom: 5px;"><i class="fa-solid fa-phone"></i> +91 81248 72367</p>
+                <p style="margin-bottom: 5px;"><i class="fa-solid fa-phone"></i> +91 6381004076</p>
+        <p style="margin-bottom: 5px;"><i class="fa-solid fa-phone"></i> +91 6379259497</p>
+
         <p><i class="fa-solid fa-envelope"></i> crownbeatzorg@gmail.com</p>
       </div>
       <div class="footer-col">
@@ -456,17 +459,24 @@
   <div id="upi-modal" class="upi-modal-overlay">
     <div class="upi-modal-content glass-card">
       <h3 style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title);">Secure UPI Payment</h3>
-      <p style="color: var(--color-text-secondary); margin-bottom: 20px;">Scan the QR code or click the button to pay <strong>₹<span id="upi-amount-display"></span></strong> directly via PhonePe, GPay, or Paytm.</p>
+      <p style="color: var(--color-text-secondary); margin-bottom: 20px;">Take a screenshot or download the QR code to pay <strong>₹<span id="upi-amount-display"></span></strong> directly via PhonePe, GPay, or Paytm.</p>
       
       <div id="upi-qrcode-container" style="background: white; padding: 15px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
         <div id="upi-qrcode"></div>
       </div>
 
-      <div style="margin-bottom: 25px;">
-        <a id="upi-deeplink-btn" href="#" class="btn-glow" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; font-weight: bold;">
-          <i class="fa-brands fa-google-pay" style="font-size: 1.8rem;"></i> <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i> PAY WITH UPI APP
-        </a>
+      <div style="margin-bottom: 10px;">
+        <button type="button" id="upi-download-qr-btn" class="btn-glow" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-weight: bold; background: transparent; border: 1px solid var(--color-neon-blue);">
+          <i class="fa-solid fa-download" style="font-size: 1.2rem;"></i> DOWNLOAD QR CODE
+        </button>
       </div>
+      <p style="color: #ccc; font-size: 0.85rem; margin-bottom: 25px; text-align: left; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+        <strong>How to pay on mobile:</strong><br/>
+        1. Download or Screenshot the QR code above.<br/>
+        2. Open your UPI app (GPay / PhonePe / Paytm).<br/>
+        3. Tap the QR Scanner icon.<br/>
+        4. Select "Scan from Gallery" and choose the QR code.
+      </p>
 
       <div class="form-group" style="margin-bottom: 20px; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
