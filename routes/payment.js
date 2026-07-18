@@ -91,19 +91,24 @@ router.post('/submit-booking', async (req, res) => {
     // Enforcement of Silver and Gold Capacity Limits
     let requestedSilver = 0;
     let requestedGold = 0;
+    let requestedFamily = 0;
     if (ticketCounts.silver) {
       requestedSilver = (parseInt(ticketCounts.silver.couples)||0)*2 + (parseInt(ticketCounts.silver.adult)||0) + (parseInt(ticketCounts.silver.child)||0);
     }
     if (ticketCounts.gold) {
       requestedGold = (parseInt(ticketCounts.gold.couples)||0)*2 + (parseInt(ticketCounts.gold.adult)||0) + (parseInt(ticketCounts.gold.child)||0);
     }
+    if (ticketCounts.family) {
+      requestedFamily = parseInt(ticketCounts.family.pass)||0;
+    }
 
-    if (requestedSilver > 0 || requestedGold > 0) {
+    if (requestedSilver > 0 || requestedGold > 0 || requestedFamily > 0) {
       const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment');
       const validTickets = (currentTickets || []).filter(t => t.payment !== 'Rejected');
       
       let silverUsed = 0;
       let goldUsed = 0;
+      let familyUsed = 0;
       validTickets.forEach(t => {
         if (t.booking_details) {
           if (t.booking_details.silver) {
@@ -111,6 +116,9 @@ router.post('/submit-booking', async (req, res) => {
           }
           if (t.booking_details.gold) {
              goldUsed += (parseInt(t.booking_details.gold.couples)||0)*2 + (parseInt(t.booking_details.gold.adult)||0) + (parseInt(t.booking_details.gold.child)||0);
+          }
+          if (t.booking_details.family) {
+             familyUsed += parseInt(t.booking_details.family.pass)||0;
           }
         }
       });
@@ -120,6 +128,9 @@ router.post('/submit-booking', async (req, res) => {
       }
       if (requestedGold > (250 - goldUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only ${Math.max(0, 250 - goldUsed)} left.` });
+      }
+      if (requestedFamily > (15 - familyUsed)) {
+         return res.status(400).json({ success: false, error: `Not enough Family Passes available. Only ${Math.max(0, 15 - familyUsed)} left.` });
       }
     }
 

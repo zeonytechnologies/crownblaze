@@ -15,7 +15,8 @@ window.ticketCounts = {
 
 window.seatAvailability = {
   silver: 250,
-  gold: 250
+  gold: 250,
+  family: 15
 };
 
 window.updateQty = (category, type, delta) => {
@@ -39,12 +40,20 @@ window.updateQty = (category, type, delta) => {
     }
   }
 
-  if (delta > 0 && (category === 'silver' || category === 'gold')) {
-    const reqSeats = (type === 'couples' ? 2 : 1);
-    const currentCatSeats = (window.ticketCounts[category].couples * 2) + window.ticketCounts[category].adult + window.ticketCounts[category].child;
+  if (delta > 0 && (category === 'silver' || category === 'gold' || category === 'family')) {
+    let reqSeats = 1;
+    let currentCatSeats = 0;
+
+    if (category === 'silver' || category === 'gold') {
+      reqSeats = (type === 'couples' ? 2 : 1);
+      currentCatSeats = (window.ticketCounts[category].couples * 2) + window.ticketCounts[category].adult + window.ticketCounts[category].child;
+    } else if (category === 'family') {
+      reqSeats = 1;
+      currentCatSeats = window.ticketCounts.family.pass;
+    }
     
     if (currentCatSeats + reqSeats > window.seatAvailability[category]) {
-      showToast(`Not enough ${category.charAt(0).toUpperCase() + category.slice(1)} seats available! Only ${window.seatAvailability[category]} left.`, 'error');
+      showToast(`Not enough ${category.charAt(0).toUpperCase() + category.slice(1)} Passes available! Only ${window.seatAvailability[category]} left.`, 'error');
       return;
     }
   }
@@ -210,6 +219,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       const goldBadge = document.getElementById('gold-remaining-badge');
       if (goldBadge) goldBadge.innerText = `${data.availability.gold} Seats Left`;
+
+      const familyBadge = document.getElementById('family-remaining-badge');
+      if (familyBadge) familyBadge.innerText = `${data.availability.family} Passes Left`;
     }
   } catch (err) {
     console.error('Failed to fetch availability:', err);
