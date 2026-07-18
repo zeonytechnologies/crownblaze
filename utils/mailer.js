@@ -65,7 +65,7 @@ const sendTicketEmail = (ticketData) => {
     const payload = JSON.stringify({
       sender: {
         name: "CrownBeatz",
-        email: process.env.SMTP_FROM || "b26aad001@smtp-brevo.com"
+        email: process.env.SMTP_FROM || "crownbeatzorg@gmail.com"
       },
       to: [
         {
