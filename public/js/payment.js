@@ -22,7 +22,8 @@ const openUpiModal = (amount) => {
   upiAmountDisplay.textContent = amount;
   
   // Construct the standard UPI Deep link intent URL
-  currentUpiUrl = `upi://pay?pa=${UPI_ID}&pn=${PAYEE_NAME}&am=${amount}&cu=INR`;
+  const formattedAmount = Number(amount).toFixed(2);
+  currentUpiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${formattedAmount}&cu=INR`;
   
   // Update the Mobile Deeplink Button
   upiDeeplinkBtn.href = currentUpiUrl;
