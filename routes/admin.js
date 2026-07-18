@@ -103,7 +103,8 @@ router.get('/dashboard', async (req, res) => {
     const categoryStats = {
       General: { adults: 0, couples: 0 },
       Silver: { adults: 0, couples: 0 },
-      Gold: { adults: 0, couples: 0 }
+      Gold: { adults: 0, couples: 0 },
+      Family: { pass: 0 }
     };
 
     const startOfToday = new Date();
@@ -127,6 +128,9 @@ router.get('/dashboard', async (req, res) => {
         if (t.booking_details.gold) {
           categoryStats.Gold.adults += parseInt(t.booking_details.gold.adult) || 0;
           categoryStats.Gold.couples += parseInt(t.booking_details.gold.couples) || 0;
+        }
+        if (t.booking_details.family) {
+          categoryStats.Family.pass += parseInt(t.booking_details.family.pass) || 0;
         }
       } else {
         // Fallback for legacy records before booking_details existed

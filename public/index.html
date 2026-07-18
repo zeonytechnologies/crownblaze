@@ -116,7 +116,10 @@
 
               <!-- Silver Category -->
               <div style="margin-bottom: 15px; border: 1px solid silver; padding: 16px; border-radius: 12px; background: rgba(192,192,192,0.05);">
-                <label style="display:block; font-size:1.1rem; margin-bottom:12px; color: silver; font-weight:600;">Silver Pass</label>
+                <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: silver; font-weight:600;">
+                  <span>Silver Pass</span>
+                  <span id="silver-remaining-badge" style="font-size: 0.8rem; background: rgba(192,192,192,0.2); padding: 4px 8px; border-radius: 12px; font-weight: 500;"></span>
+                </label>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <div>
                     <div style="font-weight: 600;">Couples Pass</div>
@@ -154,7 +157,10 @@
 
               <!-- Gold Category -->
               <div style="border: 1px solid #ffd700; padding: 16px; border-radius: 12px; background: rgba(255,215,0,0.05);">
-                <label style="display:block; font-size:1.1rem; margin-bottom:12px; color: #ffd700; font-weight:600;">Gold Pass</label>
+                <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: #ffd700; font-weight:600;">
+                  <span>Gold Pass</span>
+                  <span id="gold-remaining-badge" style="font-size: 0.8rem; background: rgba(255,215,0,0.2); padding: 4px 8px; border-radius: 12px; font-weight: 500;"></span>
+                </label>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <div>
                     <div style="font-weight: 600;">Couples Pass</div>
@@ -186,6 +192,25 @@
                     <button type="button" class="qty-btn" onclick="updateQty('gold', 'child', -1)">-</button>
                     <span class="qty-value" id="qty-gold-child-val">0</span>
                     <button type="button" class="qty-btn" onclick="updateQty('gold', 'child', 1)">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Family Category -->
+              <div style="margin-top: 15px; border: 1px solid #ff3366; padding: 16px; border-radius: 12px; background: rgba(255,51,102,0.05);">
+                <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: #ff3366; font-weight:600;">
+                  <span>Family Pass</span>
+                  <span id="family-remaining-badge" style="font-size: 0.8rem; background: rgba(255,51,102,0.2); padding: 4px 8px; border-radius: 12px; font-weight: 500;"></span>
+                </label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 600;">Group Pass (Max 6 Persons)</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹2499 per pass</div>
+                  </div>
+                  <div class="quantity-control">
+                    <button type="button" class="qty-btn" onclick="updateQty('family', 'pass', -1)">-</button>
+                    <span class="qty-value" id="qty-family-pass-val">0</span>
+                    <button type="button" class="qty-btn" onclick="updateQty('family', 'pass', 1)">+</button>
                   </div>
                 </div>
               </div>
@@ -251,6 +276,15 @@
                 <li style="margin-bottom: 6px;">Premium VIP Seating</li>
                 <li style="margin-bottom: 6px;">Access to Dancing Area</li>
                 <li>Free for Children under 12 age (Separate space for children)</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 3px solid #ff3366; text-align: center; margin-top: 15px;">
+              <div style="font-weight: bold; color: #ff3366; font-size: 1.1rem; margin-bottom: 10px;">Family Pass</div>
+              <ul style="list-style: none; color: var(--color-text-secondary); font-size: 0.85rem; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">Entry for up to 6 persons</li>
+                <li style="margin-bottom: 6px;">Perfect for large groups or families</li>
+                <li>Access to all General & Common Areas</li>
               </ul>
             </div>
           </div>
@@ -342,7 +376,7 @@
           <div class="info-icon"><i class="fa-regular fa-calendar-days"></i></div>
           <div>
             <h3 class="info-title">Date</h3>
-            <p class="info-text">August 1st week</p>
+            <p class="info-text">August(Date will be disclosed soon)</p>
           </div>
         </div>
         <div class="info-item">

@@ -86,16 +86,26 @@ const handleBookingSubmit = (e) => {
   let totalAdultsCouples = 0;
   let totalChildren = 0;
   
-  const cats = ['general', 'silver', 'gold'];
-  const types = ['couples', 'adult', 'child'];
+  const cats = ['general', 'silver', 'gold', 'family'];
+  const types = ['couples', 'adult', 'child', 'pass'];
   
   cats.forEach(cat => {
     types.forEach(type => {
-      const qty = window.ticketCounts[cat][type];
-      totalTickets += qty;
-      totalAmount += (window.ticketPrices[cat][type] * qty);
-      if (type === 'child') totalChildren += qty;
-      else totalAdultsCouples += qty;
+      const qty = window.ticketCounts[cat][type] || 0;
+      if (qty > 0) {
+        if (type === 'pass') {
+          totalTickets += qty * 6; // 6 entries per pass
+          totalAdultsCouples += qty * 6;
+        } else if (type === 'couples') {
+          totalTickets += qty * 2;
+          totalAdultsCouples += qty * 2;
+        } else {
+          totalTickets += qty;
+          if (type === 'child') totalChildren += qty;
+          else totalAdultsCouples += qty;
+        }
+        totalAmount += (window.ticketPrices[cat][type] * qty);
+      }
     });
   });
 

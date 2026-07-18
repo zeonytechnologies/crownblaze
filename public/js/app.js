@@ -1,24 +1,33 @@
 // Global State for Multi-Category Pricing
 window.ticketPrices = {
-  general: { couples: 549, adult: 349, child: 0 },
-  silver: { couples: 799, adult: 499, child: 0 },
-  gold: { couples: 899, adult: 599, child: 0 }
+  general: { couples: 549, adult: 349, child: 0, pass: 0 },
+  silver: { couples: 799, adult: 499, child: 0, pass: 0 },
+  gold: { couples: 899, adult: 599, child: 0, pass: 0 },
+  family: { couples: 0, adult: 0, child: 0, pass: 2499 }
 };
 
 window.ticketCounts = {
-  general: { couples: 0, adult: 0, child: 0 },
-  silver: { couples: 0, adult: 0, child: 0 },
-  gold: { couples: 0, adult: 0, child: 0 }
+  general: { couples: 0, adult: 0, child: 0, pass: 0 },
+  silver: { couples: 0, adult: 0, child: 0, pass: 0 },
+  gold: { couples: 0, adult: 0, child: 0, pass: 0 },
+  family: { couples: 0, adult: 0, child: 0, pass: 0 }
+};
+
+window.seatAvailability = {
+  silver: 250,
+  gold: 250
 };
 
 window.updateQty = (category, type, delta) => {
   const currentTotal = 
-    window.ticketCounts.general.couples + window.ticketCounts.general.adult + window.ticketCounts.general.child +
-    window.ticketCounts.silver.couples + window.ticketCounts.silver.adult + window.ticketCounts.silver.child +
-    window.ticketCounts.gold.couples + window.ticketCounts.gold.adult + window.ticketCounts.gold.child;
+    window.ticketCounts.general.couples*2 + window.ticketCounts.general.adult + window.ticketCounts.general.child +
+    window.ticketCounts.silver.couples*2 + window.ticketCounts.silver.adult + window.ticketCounts.silver.child +
+    window.ticketCounts.gold.couples*2 + window.ticketCounts.gold.adult + window.ticketCounts.gold.child +
+    window.ticketCounts.family.pass*6;
     
-  if (delta > 0 && currentTotal >= 10) {
-    showToast('Maximum 10 tickets can be booked at a time.', 'error');
+  if (delta > 0 && currentTotal >= 20) {
+    // Increased total limit to accommodate family passes (e.g., 2 family passes = 12 people)
+    showToast('Maximum 20 people can be booked at a time.', 'error');
     return;
   }
   
@@ -26,6 +35,16 @@ window.updateQty = (category, type, delta) => {
     const totalChildren = window.ticketCounts.general.child + window.ticketCounts.silver.child + window.ticketCounts.gold.child;
     if (totalChildren >= 2) {
       showToast('Maximum 2 children allowed per booking.', 'error');
+      return;
+    }
+  }
+
+  if (delta > 0 && (category === 'silver' || category === 'gold')) {
+    const reqSeats = (type === 'couples' ? 2 : 1);
+    const currentCatSeats = (window.ticketCounts[category].couples * 2) + window.ticketCounts[category].adult + window.ticketCounts[category].child;
+    
+    if (currentCatSeats + reqSeats > window.seatAvailability[category]) {
+      showToast(`Not enough ${category.charAt(0).toUpperCase() + category.slice(1)} seats available! Only ${window.seatAvailability[category]} left.`, 'error');
       return;
     }
   }
@@ -43,8 +62,8 @@ const initPricingCalculator = () => {
     if (breakdownList) breakdownList.innerHTML = '';
     let hasItems = false;
 
-    const cats = ['general', 'silver', 'gold'];
-    const types = ['couples', 'adult', 'child'];
+    const cats = ['general', 'silver', 'gold', 'family'];
+    const types = ['couples', 'adult', 'child', 'pass'];
     
     cats.forEach(cat => {
       types.forEach(type => {
@@ -176,6 +195,23 @@ window.openPolicy = (type) => {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initPricingCalculator();
+
+  try {
+    const response = await fetch('/api/ticket/availability');
+    const data = await response.json();
+    if (data.success && data.availability) {
+      window.seatAvailability = data.availability;
+      
+      // Update UI badges
+      const silverBadge = document.getElementById('silver-remaining-badge');
+      if (silverBadge) silverBadge.innerText = `${data.availability.silver} Seats Left`;
+      
+      const goldBadge = document.getElementById('gold-remaining-badge');
+      if (goldBadge) goldBadge.innerText = `${data.availability.gold} Seats Left`;
+    }
+  } catch (err) {
+    console.error('Failed to fetch availability:', err);
+  }
 });

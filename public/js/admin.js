@@ -116,6 +116,9 @@ const loadDashboardStats = async () => {
         document.getElementById('cat-sil-couple').innerText = cats.Silver.couples;
         document.getElementById('cat-gol-adult').innerText = cats.Gold.adults;
         document.getElementById('cat-gol-couple').innerText = cats.Gold.couples;
+        if (cats.Family && document.getElementById('cat-fam-pass')) {
+          document.getElementById('cat-fam-pass').innerText = cats.Family.pass;
+        }
       }
     } else {
       if (response.status === 401) handleSessionExpired();
