@@ -66,4 +66,29 @@ router.get('/availability', async (req, res) => {
   }
 });
 
+// GET: /api/ticket/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    
+    // Prevent routing conflicts with /availability
+    if (ticketId === 'availability') return; 
+    
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .eq('ticket_id', ticketId)
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({ success: false, error: 'Ticket not found or does not exist.' });
+    }
+
+    res.json({ success: true, ticket: data });
+  } catch (error) {
+    console.error('Error fetching ticket data:', error);
+    res.status(500).json({ success: false, error: 'Internal server error fetching ticket details.' });
+  }
+});
+
 module.exports = router;
