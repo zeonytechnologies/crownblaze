@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bulk Tickets | CrownBeatz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --gold: #cfa878;
+      --teal: #1abc9c;
+      --text: #e6edf3;
+      --subtext: #8b949e;
+      --border: #cfa878;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #fff; /* For screen preview outside tickets */
+    }
+
+    .print-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .ticket {
+      display: flex;
+      background-color: var(--bg);
+      color: var(--text);
+      width: 100%;
+      height: 250px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      position: relative;
+      page-break-inside: avoid;
+    }
+
+    .ticket:nth-child(3n) {
+      page-break-after: always;
+    }
+
+    .ticket-main {
+      flex: 3;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .ticket-stub {
+      flex: 1;
+      padding: 30px 20px;
+      border-left: 2px dashed rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Cutouts */
+    .ticket-stub::before,
+    .ticket-stub::after {
+      content: '';
+      position: absolute;
+      left: -12px;
+      width: 24px;
+      height: 24px;
+      background-color: #fff;
+      border-radius: 50%;
+      border-right: 2px solid var(--border);
+    }
+    
+    .ticket-stub::before {
+      top: -14px;
+      transform: rotate(-45deg);
+      border-bottom: 2px solid var(--border);
+      border-top: none;
+      border-left: none;
+    }
+    
+    .ticket-stub::after {
+      bottom: -14px;
+      transform: rotate(45deg);
+      border-top: 2px solid var(--border);
+      border-bottom: none;
+      border-left: none;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .ticket-stub::before, .ticket-stub::after { background-color: #fff; }
+      .print-container { padding: 0; max-width: 100%; }
+      .no-print { display: none !important; }
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    
+    .brand-subtitle {
+      font-size: 10px;
+      color: var(--teal);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .event-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 25px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .label {
+      font-size: 9px;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .value.highlight {
+      color: var(--teal);
+    }
+
+    .value.gold-highlight {
+      color: var(--gold);
+    }
+
+    /* Stub styling */
+    .stub-title {
+      font-family: 'Outfit', sans-serif;
+      color: var(--gold);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .stub-item { margin-bottom: 12px; }
+    .stub-label { font-size: 9px; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
+    .stub-val { font-size: 11px; font-weight: 600; }
+    
+    .qr-container {
+      background: #fff;
+      padding: 5px;
+      border-radius: 4px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .qr-text {
+      text-align: center;
+      font-size: 8px;
+      color: var(--subtext);
+      margin-top: 5px;
+    }
+
+    .print-btn {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 15px;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-btn no-print" onclick="window.print()">Print Tickets</button>
+
+  <div class="print-container" id="tickets-container">
+    <!-- Tickets will be generated here -->
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ticketsData = JSON.parse(sessionStorage.getItem('bulkTickets') || '[]');
+      const container = document.getElementById('tickets-container');
+
+      if (ticketsData.length === 0) {
+        container.innerHTML = '<p style="text-align:center; margin-top:50px;">No tickets found. Please generate them from the admin dashboard.</p>';
+        return;
+      }
+
+      ticketsData.forEach((ticket, index) => {
+        const t = document.createElement('div');
+        t.className = 'ticket';
+        
+        // Determine tier color class
+        let accessClass = 'highlight';
+        if (ticket.category === 'Family' || ticket.category === 'Gold') accessClass = 'gold-highlight';
+
+        t.innerHTML = `
+          <div class="ticket-main">
+            <div>
+              <div class="brand-title">CROWNBEATZ</div>
+              <div class="brand-subtitle">Live Music & Beats Experience</div>
+              <div class="event-title">ELECTRONIC BEATS FESTIVAL 2026</div>
+            </div>
+            
+            <div class="grid">
+              <div>
+                <div class="label">Date & Time</div>
+                <div class="value">Saturday, Oct 24, 2026</div>
+                <div class="value">06:30 PM onwards</div>
+              </div>
+              <div>
+                <div class="label">Venue</div>
+                <div class="value">Murugan Idli Shop Ground</div>
+                <div class="value">Krishnagiri</div>
+              </div>
+              <div>
+                <div class="label">Access Level</div>
+                <div class="value ${accessClass}" style="text-transform: uppercase;">${ticket.category} PASS</div>
+              </div>
+              <div>
+                <div class="label">Ticket Number</div>
+                <div class="value">${ticket.ticket_id}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="ticket-stub">
+            <div>
+              <div class="stub-title">TICKET STUB</div>
+              <div class="stub-item">
+                <div class="stub-label">Event</div>
+                <div class="stub-val">Beats Festival '26</div>
+              </div>
+              <div class="stub-item">
+                <div class="stub-label">Tier</div>
+                <div class="stub-val ${accessClass}" style="text-transform: uppercase;">${ticket.category}</div>
+              </div>
+            </div>
+            
+            <div style="text-align:center;">
+              <div class="qr-container" id="qr-${index}"></div>
+              <div class="qr-text">* ${ticket.ticket_id} *</div>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(t);
+
+        // Generate QR code inside the stub
+        new QRCode(document.getElementById(`qr-${index}`), {
+          text: ticket.ticket_id,
+          width: 70,
+          height: 70,
+          colorDark : "#000000",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.M
+        });
+      });
+    });
+  </script>
+</body>
+</html>

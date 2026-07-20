@@ -57,8 +57,16 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/scanner', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'scanner-login.html'));
+});
+
 app.get('/admin/scanner', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'scanner.html'));
+});
+
+app.get('/admin/print-bulk', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'print-bulk.html'));
 });
 
 // Fallback for Vercel/SPA routing and index mapping

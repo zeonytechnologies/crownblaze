@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner Login | CrownBeatz</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: var(--color-bg);
+    }
+    .login-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--color-neon-blue);
+      border-radius: 8px;
+      color: #fff;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h2 style="color: var(--color-neon-blue); margin-bottom: 10px;">Scanner Access</h2>
+    <p style="color: silver; margin-bottom: 25px; font-size: 0.9rem;">Enter volunteer passcode to access scanner.</p>
+    
+    <input type="password" id="passcode" class="input-field" placeholder="Enter Passcode">
+    
+    <button id="btnLogin" class="btn btn-primary" style="width: 100%;">Access Scanner</button>
+    <p id="error-msg" style="color: #ff3366; margin-top: 15px; display: none; font-size: 0.9rem;"></p>
+  </div>
+
+  <script>
+    document.getElementById('btnLogin').addEventListener('click', () => {
+      const code = document.getElementById('passcode').value.trim();
+      const errorMsg = document.getElementById('error-msg');
+      
+      if (code === 'Crownbeatz_scan_2026') {
+        localStorage.setItem('scannerKey', code);
+        window.location.href = '/admin/scanner';
+      } else {
+        errorMsg.innerText = 'Invalid passcode!';
+        errorMsg.style.display = 'block';
+      }
+    });
+
+    document.getElementById('passcode').addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') document.getElementById('btnLogin').click();
+    });
+  </script>
+</body>
+</html>

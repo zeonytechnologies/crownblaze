@@ -1,9 +1,10 @@
 // QR Scanner logic
 const adminToken = localStorage.getItem('adminToken');
+const scannerKey = localStorage.getItem('scannerKey');
 
-// Redirect to admin login if not logged in
-if (!adminToken) {
-  window.location.href = '/admin';
+// Redirect to admin/scanner login if no valid token or key exists
+if (!adminToken && !scannerKey) {
+  window.location.href = '/scanner';
 }
 
 let html5QrcodeScanner;
@@ -54,7 +55,7 @@ const verifyTicket = async (verificationUrl, options = {}) => {
       ...options,
       headers: {
         ...options.headers,
-        'Authorization': `Bearer ${adminToken}`
+        'Authorization': adminToken ? `Bearer ${adminToken}` : `Scanner ${scannerKey}`
       }
     });
 
@@ -192,7 +193,7 @@ btnConfirmCheckin.addEventListener('click', async () => {
     const response = await fetch('/api/admin/checkin', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${adminToken}`,
+        'Authorization': adminToken ? `Bearer ${adminToken}` : `Scanner ${scannerKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ ticketId, couples, adults, children })

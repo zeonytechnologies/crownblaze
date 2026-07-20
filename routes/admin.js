@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { supabase } = require('../supabase/client');
-const { adminAuth } = require('../middleware/auth');
+const { adminAuth, scannerAuth } = require('../middleware/auth');
 const { sendTicketEmail } = require('../utils/mailer');
 
 // Self-seed helper: inserts default admin if none exists
@@ -81,11 +81,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ALL SUBSEQUENT ROUTES ARE PROTECTED
-router.use(adminAuth);
+// ALL SUBSEQUENT ROUTES ARE PROTECTED INDIVIDUALLY
 
 // GET: /api/admin/dashboard
-router.get('/dashboard', async (req, res) => {
+router.get('/dashboard', adminAuth, async (req, res) => {
   try {
     // 1. Fetch total tickets sold (sum of ticket_count)
     const { data: sumData, error: sumError } = await supabase
@@ -182,7 +181,7 @@ router.get('/dashboard', async (req, res) => {
 });
 
 // GET: /api/admin/tickets
-router.get('/tickets', async (req, res) => {
+router.get('/tickets', adminAuth, async (req, res) => {
   try {
     const { search, attendance, page = 1, limit = 10 } = req.query;
 
@@ -239,7 +238,7 @@ router.get('/tickets', async (req, res) => {
 });
 
 // POST: /api/admin/attendance (Manual Toggle)
-router.post('/attendance', async (req, res) => {
+router.post('/attendance', adminAuth, async (req, res) => {
   try {
     const { ticketId, attendance } = req.body;
 
@@ -287,7 +286,7 @@ router.post('/attendance', async (req, res) => {
 });
 
 // GET: /api/admin/verify/:ticketId (Scanner check-in endpoint)
-router.get('/verify/:ticketId', async (req, res) => {
+router.get('/verify/:ticketId', scannerAuth, async (req, res) => {
   try {
     const { ticketId } = req.params;
 
@@ -360,7 +359,7 @@ router.get('/verify/:ticketId', async (req, res) => {
 });
 
 // POST: /api/admin/checkin (Perform Partial/Full Check-in)
-router.post('/checkin', async (req, res) => {
+router.post('/checkin', scannerAuth, async (req, res) => {
   try {
     const { ticketId, couples, adults, children } = req.body;
 
@@ -436,7 +435,7 @@ router.post('/checkin', async (req, res) => {
 });
 
 // POST: /api/admin/verify-payment
-router.post('/verify-payment', async (req, res) => {
+router.post('/verify-payment', adminAuth, async (req, res) => {
   try {
     const { ticketId, status } = req.body; // status should be 'Verified' or 'Rejected'
     
@@ -476,7 +475,7 @@ router.post('/verify-payment', async (req, res) => {
 });
 
 // POST: /api/admin/verify-manual
-router.post('/verify-manual', async (req, res) => {
+router.post('/verify-manual', scannerAuth, async (req, res) => {
   try {
     const { identifier } = req.body;
     if (!identifier) {
@@ -557,6 +556,77 @@ router.post('/verify-manual', async (req, res) => {
   } catch (error) {
     console.error('Error in manual verification:', error);
     res.status(500).json({ success: false, error: 'Failed to verify ticket.' });
+  }
+});
+
+// POST: /api/admin/bulk-generate
+router.post('/bulk-generate', adminAuth, async (req, res) => {
+  try {
+    const { category, quantity } = req.body;
+    
+    if (!category || !quantity || quantity < 1 || quantity > 50) {
+      return res.status(400).json({ success: false, error: 'Invalid category or quantity (must be 1-50).' });
+    }
+
+    const qty = parseInt(quantity, 10);
+    const generatedTickets = [];
+
+    for (let i = 0; i < qty; i++) {
+      // Format CB-2026-XXXXX
+      const randNum = Math.floor(10000 + Math.random() * 90000); 
+      const ticketId = `CB-2026-${randNum}`;
+
+      const booking_details = {};
+      let adultCount = 0;
+      let couplesCount = 0;
+      let childCount = 0;
+      let ticketCount = 1;
+
+      if (category.toLowerCase() === 'family') {
+        booking_details.family = { pass: 1 };
+        adultCount = 6;
+        ticketCount = 6;
+      } else {
+        const catKey = category.toLowerCase();
+        booking_details[catKey] = { adult: 1, couples: 0, child: 0 };
+        adultCount = 1;
+      }
+
+      const uniquePhone = `000${Date.now().toString().slice(-4)}${i.toString().padStart(3, '0')}`;
+
+      generatedTickets.push({
+        ticket_id: ticketId,
+        order_id: `BULK_ORDER_${Date.now()}_${i}`,
+        payment_id: `OFFLINE_BULK_${Date.now()}_${i}`,
+        qr_data: ticketId,
+        name: 'Offline Bulk Ticket',
+        phone: uniquePhone,
+        email: `offline${i}@crownbeatz.com`,
+        amount: 0,
+        category: category,
+        ticket_count: ticketCount,
+        adult_count: adultCount,
+        couples_count: couplesCount,
+        child_count: childCount,
+        booking_details: booking_details,
+        payment: 'Verified',
+        attendance: false,
+        booked_at: new Date().toISOString()
+      });
+    }
+
+    const { error } = await supabase.from('tickets').insert(generatedTickets);
+
+    if (error) {
+      console.error('Supabase bulk insert error:', error);
+      return res.status(500).json({ success: false, error: 'Failed to generate bulk tickets in database.' });
+    }
+
+    res.json({ success: true, tickets: generatedTickets });
+
+  } catch (err) {
+    console.error('Error generating bulk tickets:', err);
+    res.status(500).json({ success: false, error: 'Internal server error.' });
   }
 });
 

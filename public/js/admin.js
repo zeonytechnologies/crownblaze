@@ -316,6 +316,60 @@ btnNext.addEventListener('click', () => {
 
 // Search & filter triggers
 let searchDebounce;
+document.addEventListener('DOMContentLoaded', () => {
+  loadDashboardStats();
+  loadTickets();
+  setInterval(loadDashboardStats, 60000); // refresh stats every minute
+  
+  // Setup Bulk Generate Listener
+  const btnGenerateBulk = document.getElementById('btn-generate-bulk');
+  if (btnGenerateBulk) {
+    btnGenerateBulk.addEventListener('click', async () => {
+      const category = document.getElementById('bulk-category').value;
+      const quantity = document.getElementById('bulk-qty').value;
+      
+      if (!quantity || quantity < 1 || quantity > 50) {
+        showToast('Please enter a valid quantity between 1 and 50.', 'error');
+        return;
+      }
+      
+      try {
+        btnGenerateBulk.disabled = true;
+        btnGenerateBulk.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+        
+        const response = await fetch('/api/admin/bulk-generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ category, quantity })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          showToast(`Successfully generated ${data.tickets.length} tickets. Preparing for print...`, 'success');
+          // Save tickets to sessionStorage to pass to the print page
+          sessionStorage.setItem('bulkTickets', JSON.stringify(data.tickets));
+          // Refresh dashboard
+          loadDashboardStats();
+          loadTickets();
+          // Open print window
+          window.open('/admin/print-bulk', '_blank');
+        } else {
+          showToast(data.error || 'Failed to generate bulk tickets.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Network error during generation.', 'error');
+      } finally {
+        btnGenerateBulk.disabled = false;
+        btnGenerateBulk.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate & Print';
+      }
+    });
+  }
+});
+
 searchInput.addEventListener('input', () => {
   clearTimeout(searchDebounce);
   searchDebounce = setTimeout(() => {
