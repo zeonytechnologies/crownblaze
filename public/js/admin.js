@@ -15,6 +15,14 @@ const btnLogout = document.getElementById('btn-logout');
 const searchInput = document.getElementById('ticket-search');
 const filterSelect = document.getElementById('filter-attendance');
 const tableBody = document.getElementById('tickets-table-body');
+const offlineTableBody = document.getElementById('offline-tickets-table-body');
+
+// Tabs
+let activeTab = 'online';
+const tabOnline = document.getElementById('tab-online');
+const tabOffline = document.getElementById('tab-offline');
+const onlineTableWrapper = document.getElementById('online-table-wrapper');
+const offlineTableWrapper = document.getElementById('offline-table-wrapper');
 
 // Stats elements
 const statTotal = document.getElementById('stat-total');
@@ -57,6 +65,38 @@ const updateView = () => {
     dashboardSection.style.display = 'none';
   }
 };
+
+if (tabOnline) {
+  tabOnline.addEventListener('click', () => {
+    activeTab = 'online';
+    tabOnline.className = 'btn btn-primary';
+    tabOnline.style.background = '';
+    tabOnline.style.color = '';
+    tabOffline.className = 'btn btn-secondary';
+    tabOffline.style.background = 'transparent';
+    tabOffline.style.color = '#fff';
+    onlineTableWrapper.style.display = 'block';
+    offlineTableWrapper.style.display = 'none';
+    currentPage = 1;
+    loadTickets();
+  });
+}
+
+if (tabOffline) {
+  tabOffline.addEventListener('click', () => {
+    activeTab = 'offline';
+    tabOffline.className = 'btn btn-primary';
+    tabOffline.style.background = '';
+    tabOffline.style.color = '';
+    tabOnline.className = 'btn btn-secondary';
+    tabOnline.style.background = 'transparent';
+    tabOnline.style.color = '#fff';
+    offlineTableWrapper.style.display = 'block';
+    onlineTableWrapper.style.display = 'none';
+    currentPage = 1;
+    loadTickets();
+  });
+}
 
 // Handle Login
 loginForm.addEventListener('submit', async (e) => {
@@ -110,6 +150,11 @@ const loadDashboardStats = async () => {
       const statVerifiedRev = document.getElementById('stat-verified-revenue');
       const statPendingCount = document.getElementById('stat-pending-count');
       const statPendingRev = document.getElementById('stat-pending-revenue');
+      const statOnlineCount = document.getElementById('stat-online-count');
+      const statOfflineCount = document.getElementById('stat-offline-count');
+      
+      if (statOnlineCount) statOnlineCount.innerText = data.stats.onlineCount || 0;
+      if (statOfflineCount) statOfflineCount.innerText = data.stats.offlineCount || 0;
       
       if (statVerifiedCount) statVerifiedCount.innerText = data.stats.paymentVerifiedCount || 0;
       if (statVerifiedRev) statVerifiedRev.innerText = parseFloat(data.stats.paymentVerifiedRevenue || 0).toFixed(2);
@@ -141,7 +186,7 @@ const loadTickets = async () => {
   try {
     const searchVal = searchInput.value.trim();
     const attendanceVal = filterSelect.value;
-    let url = `/api/admin/tickets?page=${currentPage}&limit=${limit}`;
+    let url = `/api/admin/tickets?page=${currentPage}&limit=${limit}&type=${activeTab}`;
 
     if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
     if (attendanceVal !== 'all') url += `&attendance=${attendanceVal}`;
@@ -153,7 +198,11 @@ const loadTickets = async () => {
     const data = await response.json();
     if (data.success) {
       currentTicketData = data.tickets;
-      renderTicketsTable(data.tickets);
+      if (activeTab === 'online') {
+        renderTicketsTable(data.tickets);
+      } else {
+        renderOfflineTicketsTable(data.tickets);
+      }
       totalPages = data.totalPages || 1;
       
       // Update pagination UI
@@ -206,6 +255,37 @@ const renderTicketsTable = (tickets) => {
               ${checkInBtnText}
             </button>
             <button onclick="viewTicketDetails('${ticket.ticket_id}')" class="btn-secondary" style="padding: 6px 12px; font-size:0.8rem; border-color: var(--glass-border); color: #fff;">
+              Details
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+};
+
+const renderOfflineTicketsTable = (tickets) => {
+  if (tickets.length === 0) {
+    offlineTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--color-text-secondary);">No offline tickets found.</td></tr>`;
+    return;
+  }
+  
+  offlineTableBody.innerHTML = tickets.map(t => {
+    const paymentClass = t.payment === 'Verified' ? 'badge success' : 'badge pending';
+    const typeLabel = t.booking_details ? t.booking_details.type : '-';
+    
+    return `
+      <tr>
+        <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${t.ticket_id}</td>
+        <td style="font-size: 0.75rem; color: var(--color-text-secondary);">${t.order_id || '-'}</td>
+        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${t.category}</span></td>
+        <td>${typeLabel}</td>
+        <td style="font-weight: 600;">${t.ticket_count}</td>
+        <td><span class="${paymentClass}">${t.payment || 'Pending'}</span></td>
+        <td>
+          <div style="display:flex; gap:10px;">
+            ${t.payment !== 'Verified' ? `<button onclick="quickVerifyPayment('${t.ticket_id}', 'Verified')" class="btn-glow" style="padding: 6px 12px; font-size:0.8rem; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-check"></i> Verify Cash</button>` : `<span style="color:#00ff88; font-size: 0.85rem; padding: 6px 0;"><i class="fa-solid fa-check-double"></i> Collected</span>`}
+            <button onclick="viewTicketDetails('${t.ticket_id}')" class="btn-secondary" style="padding: 6px 12px; font-size:0.8rem; border-color: var(--glass-border); color: #fff;">
               Details
             </button>
           </div>

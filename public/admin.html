@@ -61,6 +61,10 @@
         <div class="glass-card stat-card">
           <h3>Total Tickets</h3>
           <span class="value" id="stat-total">0</span>
+          <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--color-text-secondary);">
+            <span>Online: <strong id="stat-online-count" style="color:#fff;">0</strong></span>
+            <span>Offline: <strong id="stat-offline-count" style="color:#fff;">0</strong></span>
+          </div>
         </div>
         <div class="glass-card stat-card">
           <h3>Today's Bookings</h3>
@@ -143,9 +147,15 @@
 
       <!-- Tickets Database Manager -->
       <div class="glass-container" style="margin-top: 40px;">
-        <h2 style="font-family: var(--font-title); font-size: 1.6rem; margin-bottom: 24px; text-transform: uppercase;">
-          Bookings Management
-        </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+          <h2 style="font-family: var(--font-title); font-size: 1.6rem; margin: 0; text-transform: uppercase;">
+            Bookings Management
+          </h2>
+          <div class="tabs" style="display: flex; gap: 10px;">
+            <button id="tab-online" class="btn btn-primary" style="padding: 8px 16px;">Online Tickets</button>
+            <button id="tab-offline" class="btn btn-secondary" style="padding: 8px 16px; border: 1px solid var(--glass-border); background: transparent; color: #fff; cursor: pointer;">Offline Tickets</button>
+          </div>
+        </div>
         
         <!-- Controls Panel -->
         <div class="control-panel">
@@ -161,8 +171,8 @@
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="table-wrapper">
+        <!-- Online Table -->
+        <div class="table-wrapper" id="online-table-wrapper">
           <table>
             <thead>
               <tr>
@@ -180,7 +190,29 @@
             </thead>
             <tbody id="tickets-table-body">
               <tr>
-                <td colspan="9" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
+                <td colspan="10" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Offline Table -->
+        <div class="table-wrapper" id="offline-table-wrapper" style="display: none;">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Order Ref</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="offline-tickets-table-body">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--color-text-secondary);">Loading offline tickets...</td>
               </tr>
             </tbody>
           </table>

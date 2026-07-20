@@ -102,6 +102,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     let paymentPendingCount = 0;
     let paymentPendingRevenue = 0.0;
     let todayBookings = 0;
+    let onlineCount = 0;
+    let offlineCount = 0;
     
     const categoryStats = {
       General: { adults: 0, couples: 0 },
@@ -125,6 +127,12 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       } else {
         paymentPendingCount += ticketsCount;
         paymentPendingRevenue += amount;
+      }
+      
+      if (t.email && t.email.toLowerCase().startsWith('offline')) {
+        offlineCount += ticketsCount;
+      } else {
+        onlineCount += ticketsCount;
       }
       
       // Parse multi-category breakdown from JSON column
@@ -186,6 +194,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         paymentVerifiedRevenue,
         paymentPendingCount,
         paymentPendingRevenue,
+        onlineCount,
+        offlineCount,
         categoryStats
       },
       recentBookings: recent || []
@@ -200,9 +210,15 @@ router.get('/dashboard', adminAuth, async (req, res) => {
 // GET: /api/admin/tickets
 router.get('/tickets', adminAuth, async (req, res) => {
   try {
-    const { search, attendance, page = 1, limit = 10 } = req.query;
+    const { search, attendance, page = 1, limit = 10, type = 'online' } = req.query;
 
-    let query = supabase.from('tickets').select('*', { count: 'exact' }).not('email', 'ilike', 'offline%');
+    let query = supabase.from('tickets').select('*', { count: 'exact' });
+
+    if (type === 'offline') {
+      query = query.ilike('email', 'offline%');
+    } else {
+      query = query.not('email', 'ilike', 'offline%');
+    }
 
     // Handle Search Filter
     if (search) {
@@ -630,7 +646,7 @@ router.post('/bulk-generate', adminAuth, async (req, res) => {
         couples_count: couplesCount,
         child_count: childCount,
         booking_details: booking_details,
-        payment: 'Verified',
+        payment: 'Pending',
         attendance: false,
         booked_at: new Date().toISOString()
       });
