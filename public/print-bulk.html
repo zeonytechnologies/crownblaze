@@ -257,6 +257,7 @@
               <div>
                 <div class="label">Access Level</div>
                 <div class="value ${accessClass}" style="text-transform: uppercase;">${ticket.category} PASS</div>
+                <div style="font-size: 10px; color: var(--subtext); margin-top: 4px;">TYPE: <span style="color:#fff;">${ticket.booking_details?.type || 'Adult'}</span></div>
               </div>
               <div>
                 <div class="label">Ticket Number</div>
@@ -275,6 +276,7 @@
               <div class="stub-item">
                 <div class="stub-label">Tier</div>
                 <div class="stub-val ${accessClass}" style="text-transform: uppercase;">${ticket.category}</div>
+                <div style="font-size: 9px; color: var(--subtext); margin-top: 2px;">TYPE: <span style="color:#fff;">${ticket.booking_details?.type || 'Adult'}</span></div>
               </div>
             </div>
             

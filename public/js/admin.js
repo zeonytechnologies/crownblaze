@@ -105,8 +105,16 @@ const loadDashboardStats = async () => {
       statTotal.innerText = data.stats.totalTickets;
       statToday.innerText = data.stats.todayBookings;
       statRevenue.innerText = parseFloat(data.stats.revenue).toFixed(2);
-      statChecked.innerText = data.stats.checkedIn;
-      statPending.innerText = data.stats.pending;
+      
+      const statVerifiedCount = document.getElementById('stat-verified-count');
+      const statVerifiedRev = document.getElementById('stat-verified-revenue');
+      const statPendingCount = document.getElementById('stat-pending-count');
+      const statPendingRev = document.getElementById('stat-pending-revenue');
+      
+      if (statVerifiedCount) statVerifiedCount.innerText = data.stats.paymentVerifiedCount || 0;
+      if (statVerifiedRev) statVerifiedRev.innerText = parseFloat(data.stats.paymentVerifiedRevenue || 0).toFixed(2);
+      if (statPendingCount) statPendingCount.innerText = data.stats.paymentPendingCount || 0;
+      if (statPendingRev) statPendingRev.innerText = parseFloat(data.stats.paymentPendingRevenue || 0).toFixed(2);
       
       const cats = data.stats.categoryStats;
       if (cats) {
@@ -323,10 +331,26 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Setup Bulk Generate Listener
   const btnGenerateBulk = document.getElementById('btn-generate-bulk');
+  const bulkCategory = document.getElementById('bulk-category');
+  const bulkType = document.getElementById('bulk-type');
+  
+  if (bulkCategory && bulkType) {
+    bulkCategory.addEventListener('change', () => {
+      if (bulkCategory.value === 'Family') {
+        bulkType.disabled = true;
+        bulkType.style.opacity = '0.5';
+      } else {
+        bulkType.disabled = false;
+        bulkType.style.opacity = '1';
+      }
+    });
+  }
+
   if (btnGenerateBulk) {
     btnGenerateBulk.addEventListener('click', async () => {
-      const category = document.getElementById('bulk-category').value;
+      const category = bulkCategory.value;
       const quantity = document.getElementById('bulk-qty').value;
+      const type = bulkType ? bulkType.value : 'Adult';
       
       if (!quantity || quantity < 1 || quantity > 50) {
         showToast('Please enter a valid quantity between 1 and 50.', 'error');
@@ -343,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${adminToken}`
           },
-          body: JSON.stringify({ category, quantity })
+          body: JSON.stringify({ category, quantity, type })
         });
         
         const data = await response.json();

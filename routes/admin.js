@@ -89,7 +89,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     // 1. Fetch total tickets sold (sum of ticket_count)
     const { data: sumData, error: sumError } = await supabase
       .from('tickets')
-      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count, booking_details');
+      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count, booking_details, payment');
 
     if (sumError) throw sumError;
 
@@ -97,6 +97,10 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     let revenue = 0.0;
     let checkedIn = 0;
     let pending = 0;
+    let paymentVerifiedCount = 0;
+    let paymentVerifiedRevenue = 0.0;
+    let paymentPendingCount = 0;
+    let paymentPendingRevenue = 0.0;
     let todayBookings = 0;
     
     const categoryStats = {
@@ -111,8 +115,17 @@ router.get('/dashboard', adminAuth, async (req, res) => {
 
     (sumData || []).forEach(t => {
       const ticketsCount = t.ticket_count || 0;
+      const amount = parseFloat(t.amount || 0);
       totalTickets += ticketsCount;
-      revenue += parseFloat(t.amount || 0);
+      revenue += amount;
+      
+      if (t.payment === 'Verified') {
+        paymentVerifiedCount += ticketsCount;
+        paymentVerifiedRevenue += amount;
+      } else {
+        paymentPendingCount += ticketsCount;
+        paymentPendingRevenue += amount;
+      }
       
       // Parse multi-category breakdown from JSON column
       if (t.booking_details) {
@@ -166,9 +179,13 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       stats: {
         totalTickets,
         todayBookings,
-        revenue: Math.round(revenue * 100) / 100,
+        revenue,
         checkedIn,
         pending,
+        paymentVerifiedCount,
+        paymentVerifiedRevenue,
+        paymentPendingCount,
+        paymentPendingRevenue,
         categoryStats
       },
       recentBookings: recent || []
@@ -185,13 +202,11 @@ router.get('/tickets', adminAuth, async (req, res) => {
   try {
     const { search, attendance, page = 1, limit = 10 } = req.query;
 
-    let query = supabase
-      .from('tickets')
-      .select('*', { count: 'exact' });
+    let query = supabase.from('tickets').select('*', { count: 'exact' }).not('email', 'ilike', 'offline%');
 
-    // Handle Search Filter (matches name, phone, ticket_id, payment_id)
+    // Handle Search Filter
     if (search) {
-      query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,ticket_id.ilike.%${search}%,payment_id.ilike.%${search}%`);
+      query = query.or(`ticket_id.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
     // Handle Attendance Filter
@@ -562,7 +577,7 @@ router.post('/verify-manual', scannerAuth, async (req, res) => {
 // POST: /api/admin/bulk-generate
 router.post('/bulk-generate', adminAuth, async (req, res) => {
   try {
-    const { category, quantity } = req.body;
+    const { category, quantity, type } = req.body;
     
     if (!category || !quantity || quantity < 1 || quantity > 50) {
       return res.status(400).json({ success: false, error: 'Invalid category or quantity (must be 1-50).' });
@@ -576,7 +591,7 @@ router.post('/bulk-generate', adminAuth, async (req, res) => {
       const randNum = Math.floor(10000 + Math.random() * 90000); 
       const ticketId = `CB-2026-${randNum}`;
 
-      const booking_details = {};
+      const booking_details = { type: type || 'Adult' };
       let adultCount = 0;
       let couplesCount = 0;
       let childCount = 0;
@@ -586,10 +601,16 @@ router.post('/bulk-generate', adminAuth, async (req, res) => {
         booking_details.family = { pass: 1 };
         adultCount = 6;
         ticketCount = 6;
+        booking_details.type = 'Family Pass';
       } else {
         const catKey = category.toLowerCase();
-        booking_details[catKey] = { adult: 1, couples: 0, child: 0 };
-        adultCount = 1;
+        if (booking_details.type === 'Couple') {
+          booking_details[catKey] = { adult: 0, couples: 1, child: 0 };
+          couplesCount = 1;
+        } else {
+          booking_details[catKey] = { adult: 1, couples: 0, child: 0 };
+          adultCount = 1;
+        }
       }
 
       const uniquePhone = `000${Date.now().toString().slice(-4)}${i.toString().padStart(3, '0')}`;
