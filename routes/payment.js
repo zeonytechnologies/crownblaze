@@ -41,10 +41,10 @@ router.post('/submit-booking', async (req, res) => {
 
     // Calculate final stored amount server-side to prevent tampering
     const ticketPrices = {
-      general: { couples: 549, adult: 349, child: 0, pass: 0 },
+      general: { couples: 599, adult: 349, child: 0, pass: 0 },
       silver: { couples: 799, adult: 499, child: 0, pass: 0 },
-      gold: { couples: 899, adult: 599, child: 0, pass: 0 },
-      family: { couples: 0, adult: 0, child: 0, pass: 2499 }
+      gold: { couples: 1199, adult: 699, child: 0, pass: 0 },
+      family: { couples: 0, adult: 0, child: 0, pass: 2999 }
     };
 
     let totalAmount = 0;
