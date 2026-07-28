@@ -147,51 +147,149 @@
       margin-bottom: 4px;
     }
 
-    .value {
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .value.highlight {
-      color: var(--teal);
-    }
-
-    .value.gold-highlight {
-      color: var(--gold);
-    }
-
-    /* Stub styling */
-    .stub-title {
+    .ticket {
+      width: 1000px;
+      height: 562.5px; /* 16:9 aspect ratio */
+      margin: 0 auto 30px auto;
+      position: relative;
+      background-image: url('/images/offline-ticket.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      page-break-inside: avoid;
+      overflow: hidden;
+      color: #fff;
       font-family: 'Outfit', sans-serif;
-      color: var(--gold);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-align: center;
-      margin-bottom: 15px;
     }
 
-    .stub-item { margin-bottom: 12px; }
-    .stub-label { font-size: 9px; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
-    .stub-val { font-size: 11px; font-weight: 600; }
+    /* Absolute positioning for dynamic overlays on the stub (right side) */
     
-    .qr-container {
-      background: #fff;
-      padding: 5px;
-      border-radius: 4px;
-      width: 80px;
-      height: 80px;
-      margin: 0 auto;
+    .overlay-category {
+      position: absolute;
+      top: 10%;
+      left: 76.5%;
+      width: 18.5%;
+      height: 15%;
+      background-color: #000;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
+    .overlay-category-main {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .overlay-category-sub {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #dfa129;
+      text-transform: uppercase;
+    }
+
+    .overlay-price {
+      position: absolute;
+      top: 26%;
+      left: 76.5%;
+      width: 18.5%;
+      height: 14%;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .price-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #9b51e0; /* Matches the original purple text */
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: -5px;
+    }
+    .price-value {
+      font-size: 48px;
+      font-weight: 800;
+      color: #dfa129;
+      letter-spacing: 1px;
+    }
+
+    /* Big Ticket QR (Replaces the glowing middle box) */
+    .overlay-ticket-qr-large {
+      position: absolute;
+      top: 43.5%;
+      left: 79.5%;
+      width: 12.5%;
+      height: 22.2%;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+
+    /* Text under the big Ticket QR (Covers old "SCAN FOR LOCATION") */
+    .overlay-ticket-id-large {
+      position: absolute;
+      top: 66%;
+      left: 77%;
+      width: 17%;
+      height: 4%;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Black box covering the Ticket ID and Barcode at the bottom */
+    .overlay-ticket-info {
+      position: absolute;
+      top: 70%;
+      left: 75.5%;
+      width: 17%;
+      height: 22.5%;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    /* Small Map QR at the bottom */
+    .overlay-map-qr-small {
+      width: 65px;
+      height: 65px;
+      background-image: url('/images/map-qr.jpeg');
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 2px;
+      border: 2px solid #fff;
+      border-radius: 4px;
+    }
+
+    .overlay-ticket-id {
+      font-size: 11px;
+      font-weight: 600;
+      color: #dfa129;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
     
-    .qr-text {
-      text-align: center;
-      font-size: 8px;
-      color: var(--subtext);
-      margin-top: 5px;
+    .overlay-type {
+      font-size: 9px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .print-btn {
@@ -207,6 +305,13 @@
       cursor: pointer;
       font-size: 16px;
     }
+    
+    @media print {
+      body { margin: 0; padding: 0; background: #fff; }
+      .no-print { display: none !important; }
+      .ticket { margin: 0 auto; page-break-after: always; zoom: 1; }
+      @page { size: landscape; margin: 0; }
+    }
   </style>
 </head>
 <body>
@@ -217,6 +322,7 @@
     <!-- Tickets will be generated here -->
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const ticketsData = JSON.parse(sessionStorage.getItem('bulkTickets') || '[]');
@@ -231,73 +337,81 @@
         const t = document.createElement('div');
         t.className = 'ticket';
         
-        // Determine tier color class
-        let accessClass = 'highlight';
-        if (ticket.category === 'Family' || ticket.category === 'Gold') accessClass = 'gold-highlight';
+        let price = parseFloat(ticket.amount).toFixed(0);
+        if (price === "0" || isNaN(price)) {
+          const prices = {
+            general: { couples: 599, adult: 349 },
+            silver: { couples: 799, adult: 499 },
+            gold: { couples: 1199, adult: 699 },
+            family: { pass: 2999 }
+          };
+          const cat = ticket.category.toLowerCase();
+          if (cat === 'family') price = 2999;
+          else if (ticket.booking_details && ticket.booking_details.type === 'Couple') {
+            price = prices[cat] ? prices[cat].couples : 0;
+          } else {
+            price = prices[cat] ? prices[cat].adult : 0;
+          }
+        }
+        
+        const typeLabel = ticket.booking_details ? ticket.booking_details.type : 'Adult';
 
         t.innerHTML = `
-          <div class="ticket-main">
-            <div>
-              <div class="brand-title">CROWNBEATZ</div>
-              <div class="brand-subtitle">Live Music & Beats Experience</div>
-              <div class="event-title">ELECTRONIC BEATS FESTIVAL 2026</div>
-            </div>
-            
-            <div class="grid">
-              <div>
-                <div class="label">Date & Time</div>
-                <div class="value">Saturday, Oct 24, 2026</div>
-                <div class="value">06:30 PM onwards</div>
-              </div>
-              <div>
-                <div class="label">Venue</div>
-                <div class="value">Murugan Idli Shop Ground</div>
-                <div class="value">Krishnagiri</div>
-              </div>
-              <div>
-                <div class="label">Access Level</div>
-                <div class="value ${accessClass}" style="text-transform: uppercase;">${ticket.category} PASS</div>
-                <div style="font-size: 10px; color: var(--subtext); margin-top: 4px;">TYPE: <span style="color:#fff;">${ticket.booking_details?.type || 'Adult'}</span></div>
-              </div>
-              <div>
-                <div class="label">Ticket Number</div>
-                <div class="value">${ticket.ticket_id}</div>
-              </div>
-            </div>
+          <!-- Category covering dummy text -->
+          <div class="overlay-category">
+            <span class="overlay-category-main">${ticket.category}</span>
+            <span class="overlay-category-sub">ADMISSION</span>
           </div>
           
-          <div class="ticket-stub">
-            <div>
-              <div class="stub-title">TICKET STUB</div>
-              <div class="stub-item">
-                <div class="stub-label">Event</div>
-                <div class="stub-val">Beats Festival '26</div>
-              </div>
-              <div class="stub-item">
-                <div class="stub-label">Tier</div>
-                <div class="stub-val ${accessClass}" style="text-transform: uppercase;">${ticket.category}</div>
-                <div style="font-size: 9px; color: var(--subtext); margin-top: 2px;">TYPE: <span style="color:#fff;">${ticket.booking_details?.type || 'Adult'}</span></div>
-              </div>
-            </div>
-            
-            <div style="text-align:center;">
-              <div class="qr-container" id="qr-${index}"></div>
-              <div class="qr-text">* ${ticket.ticket_id} *</div>
-            </div>
+          <!-- Price covering dummy text -->
+          <div class="overlay-price">
+            <span class="price-label">TICKET PRICE</span>
+            <span class="price-value">₹${price}</span>
+          </div>
+          
+          <!-- Big Ticket QR in the middle -->
+          <div class="overlay-ticket-qr-large" id="qr-${index}"></div>
+
+          <!-- Ticket ID Text Under Big QR (Covers old "SCAN FOR LOCATION") -->
+          <div class="overlay-ticket-id-large">
+            <div class="overlay-ticket-id">${ticket.ticket_id}</div>
+            <div class="overlay-type">ENTRY FOR ${typeLabel.toUpperCase()}</div>
+          </div>
+          
+          <!-- Info container covering ID and Barcode at bottom -->
+          <div class="overlay-ticket-info">
+            <!-- Small Map QR -->
+            <div class="overlay-map-qr-small"></div>
+            <!-- Location Text -->
+            <div style="font-size: 9px; font-weight: 600; color: #dfa129; letter-spacing: 1px; margin-top: 2px;">SCAN FOR LOCATION</div>
           </div>
         `;
 
         container.appendChild(t);
 
-        // Generate QR code inside the stub
+        // Generate Ticket QR code
         new QRCode(document.getElementById(`qr-${index}`), {
           text: ticket.ticket_id,
-          width: 70,
-          height: 70,
+          width: 120, // Generated size can be slightly larger for crispness
+          height: 120,
           colorDark : "#000000",
           colorLight : "#ffffff",
           correctLevel : QRCode.CorrectLevel.M
         });
+        
+        // Scale QR code to perfectly fit the flex container
+        setTimeout(() => {
+          const qrCanvas = document.querySelector(`#qr-${index} canvas`);
+          const qrImg = document.querySelector(`#qr-${index} img`);
+          if (qrCanvas) {
+            qrCanvas.style.width = '100%';
+            qrCanvas.style.height = '100%';
+          }
+          if (qrImg) {
+            qrImg.style.width = '100%';
+            qrImg.style.height = '100%';
+          }
+        }, 50);
       });
     });
   </script>

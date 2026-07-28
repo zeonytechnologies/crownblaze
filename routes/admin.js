@@ -646,7 +646,7 @@ router.post('/bulk-generate', adminAuth, async (req, res) => {
         couples_count: couplesCount,
         child_count: childCount,
         booking_details: booking_details,
-        payment: 'Pending',
+        payment: 'Verified', /* Set as pre-verified */
         attendance: false,
         booked_at: new Date().toISOString()
       });
