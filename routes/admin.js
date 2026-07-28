@@ -629,16 +629,17 @@ router.post('/bulk-generate', adminAuth, async (req, res) => {
         }
       }
 
-      const uniquePhone = `000${Date.now().toString().slice(-4)}${i.toString().padStart(3, '0')}`;
+      const timestamp = Date.now();
+      const uniquePhone = `000${timestamp.toString().slice(-4)}${i.toString().padStart(3, '0')}`;
 
       generatedTickets.push({
         ticket_id: ticketId,
-        order_id: `BULK_ORDER_${Date.now()}_${i}`,
-        payment_id: `OFFLINE_BULK_${Date.now()}_${i}`,
+        order_id: `BULK_ORDER_${timestamp}_${i}`,
+        payment_id: `OFFLINE_BULK_${timestamp}_${i}`,
         qr_data: ticketId,
         name: 'Offline Bulk Ticket',
         phone: uniquePhone,
-        email: `offline${i}@crownbeatz.com`,
+        email: `offline_${timestamp}_${i}@crownbeatz.com`,
         amount: 0,
         category: category,
         ticket_count: ticketCount,
