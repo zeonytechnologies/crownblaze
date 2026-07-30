@@ -110,6 +110,12 @@ const handleBookingSubmit = (e) => {
   });
 
   // Frontend Validations
+  const termsCheckbox = document.getElementById('terms-checkbox');
+  if (termsCheckbox && !termsCheckbox.checked) {
+    showToast('You must accept the Terms & Conditions to book tickets.', 'error');
+    return;
+  }
+
   if (totalTickets === 0) {
     showToast('Please select at least one ticket.', 'error');
     return;

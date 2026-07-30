@@ -89,7 +89,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     // 1. Fetch total tickets sold (sum of ticket_count)
     const { data: sumData, error: sumError } = await supabase
       .from('tickets')
-      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count, booking_details, payment');
+      .select('ticket_count, amount, attendance, booked_at, category, adult_count, couples_count, booking_details, payment, email');
 
     if (sumError) throw sumError;
 
@@ -121,18 +121,21 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       totalTickets += ticketsCount;
       revenue += amount;
       
-      if (t.payment === 'Verified') {
-        paymentVerifiedCount += ticketsCount;
-        paymentVerifiedRevenue += amount;
-      } else {
-        paymentPendingCount += ticketsCount;
-        paymentPendingRevenue += amount;
-      }
+      const isOffline = t.email && t.email.toLowerCase().startsWith('offline');
       
-      if (t.email && t.email.toLowerCase().startsWith('offline')) {
+      if (isOffline) {
         offlineCount += ticketsCount;
       } else {
         onlineCount += ticketsCount;
+        
+        // Only count online tickets for payment verification
+        if (t.payment === 'Verified') {
+          paymentVerifiedCount += ticketsCount;
+          paymentVerifiedRevenue += amount;
+        } else {
+          paymentPendingCount += ticketsCount;
+          paymentPendingRevenue += amount;
+        }
       }
       
       // Parse multi-category breakdown from JSON column

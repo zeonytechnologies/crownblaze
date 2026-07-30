@@ -1,8 +1,8 @@
 // Global State for Multi-Category Pricing
 window.ticketPrices = {
   general: { couples: 599, adult: 349, child: 0, pass: 0 },
-  silver: { couples: 799, adult: 499, child: 0, pass: 0 },
-  gold: { couples: 1199, adult: 699, child: 0, pass: 0 },
+  silver: { couples: 799, adult: 449, child: 0, pass: 0 },
+  gold: { couples: 1099, adult: 599, child: 0, pass: 0 },
   family: { couples: 0, adult: 0, child: 0, pass: 2999 }
 };
 
@@ -176,14 +176,29 @@ window.openPolicy = (type) => {
   if(type === 'terms') {
     title.innerHTML = 'Terms & Conditions <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById(\'policy-modal\').classList.remove(\'active\')"></i>';
     content.innerHTML = `
-      <p style="margin-bottom:10px;">By purchasing a ticket for CrownBeatz, you agree to abide by all event rules and regulations.</p>
-      <ul style="margin-left: 20px; margin-bottom: 15px;">
-        <li style="margin-bottom: 5px;">Valid government ID is required for entry.</li>
-        <li style="margin-bottom: 5px;">Management reserves the right to refuse admission.</li>
-        <li style="margin-bottom: 5px;">No outside food, beverages, or illegal substances allowed.</li>
-        <li>Event organizers are not responsible for lost or stolen items.</li>
+      <ul style="margin-left: 20px; margin-bottom: 15px; font-size: 0.9rem; color: var(--color-text-secondary);">
+        <li style="margin-bottom: 5px;">Entry is allowed only with a valid ticket or registration pass.</li>
+        <li style="margin-bottom: 5px;">The organizer reserves the right to refuse entry to anyone for safety or security reasons.</li>
+        <li style="margin-bottom: 5px;">No refunds will be provided unless the event is officially canceled by the organizer.</li>
+        <li style="margin-bottom: 5px;">Tickets are non-transferable unless approved by the organizer.</li>
+        <li style="margin-bottom: 5px;">Entry gates will close at the announced time. Late entry may not be permitted.</li>
+        <li style="margin-bottom: 5px;">Weapons, sharp objects, fireworks, illegal drugs, and other prohibited items are strictly forbidden.</li>
+        <li style="margin-bottom: 5px;">Alcohol is prohibited unless specifically permitted under applicable laws and licenses.</li>
+        <li style="margin-bottom: 5px;">Smoking or vaping is allowed only in designated areas, if provided.</li>
+        <li style="margin-bottom: 5px;">Any damage to event property will be recovered from the person responsible.</li>
+        <li style="margin-bottom: 5px;">Misbehavior, fighting, harassment, or creating disturbances will result in immediate removal without a refund.</li>
+        <li style="margin-bottom: 5px;">Follow all instructions given by security staff and event organizers.</li>
+        <li style="margin-bottom: 5px;">The organizer is not responsible for loss, theft, or damage to personal belongings.</li>
+        <li style="margin-bottom: 5px;">The event may be photographed or recorded. By entering, attendees consent to the use of their image for promotional purposes.</li>
+        <li style="margin-bottom: 5px;">The schedule, performers, or venue may change due to unavoidable circumstances.</li>
+        <li style="margin-bottom: 5px;">In case of extreme weather, technical issues, or government orders, the event may be postponed or canceled.</li>
+        <li style="margin-bottom: 5px;">Parking is at the owner’s risk. The organizer is not responsible for vehicle damage or theft.</li>
+        <li style="margin-bottom: 5px;">Minors should attend only if allowed by the event policy and, where appropriate, with a parent or guardian.</li>
+        <li style="margin-bottom: 5px;">Medical emergencies should be reported immediately to the event staff or first-aid team.</li>
+        <li style="margin-bottom: 5px;">Any violation of these terms may result in removal from the venue and possible legal action.</li>
+        <li style="margin-bottom: 5px;">By attending the event, all guests agree to comply with these Terms & Conditions.</li>
+        <li style="margin-bottom: 5px; font-weight: bold; color: var(--color-neon-blue);">Travel at Own Risk: All attendees travel to and from the event at their own risk. The organizer shall not be held responsible for any travel-related accidents, injuries, delays, or losses.</li>
       </ul>
-      <p>For any further details, contact: <strong>+91 81248 72367</strong></p>
     `;
   } else if(type === 'privacy') {
     title.innerHTML = 'Privacy Policy <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById(\'policy-modal\').classList.remove(\'active\')"></i>';
