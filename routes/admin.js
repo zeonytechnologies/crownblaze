@@ -637,41 +637,26 @@ router.post('/verify-manual', scannerAuth, async (req, res) => {
     }
 
     // Calculate remaining people
-    const couples = parseInt(ticket.couples_count, 10) || 0;
-    const adults = parseInt(ticket.adult_count, 10) || 0;
-    const kids = parseInt(ticket.child_count, 10) || 0;
-    const totalAllowed = (couples * 2) + adults + kids;
-    
-    // We fetch current checked in logs for this ticket
-    const { data: logs, error: logsError } = await supabase
-      .from('attendance_logs')
-      .select('ticket_id')
-      .eq('ticket_id', ticket.ticket_id);
-      
-    if (logsError) throw logsError;
-    
-    const currentCheckedIn = logs.reduce((sum, log) => sum + (log.headcount || 1), 0);
-    const remaining = totalAllowed - currentCheckedIn;
-    
-    if (remaining <= 0) {
-      return res.json({
-        success: true,
-        status: 'ALREADY_CHECKED_IN',
-        message: '⚠️ Already Checked In (Fully)',
-        ticket,
-        currentCheckedIn,
-        totalAllowed
-      });
-    }
+    const couplesTotal = (ticket.couples_count || 0) * 2;
+    const adultTotal = ticket.adult_count || 0;
+    const childTotal = ticket.child_count || 0;
 
-    res.json({
+    const remainingCouples = couplesTotal - (ticket.checked_in_couples || 0);
+    const remainingAdults = adultTotal - (ticket.checked_in_adult || 0);
+    const remainingChildren = childTotal - (ticket.checked_in_child || 0);
+
+    const isPartial = (ticket.checked_in_couples > 0 || ticket.checked_in_adult > 0 || ticket.checked_in_child > 0);
+
+    return res.json({
       success: true,
-      status: 'VALID',
-      message: '✅ Valid Ticket: Available for check-in.',
+      status: 'PARTIAL_CHECKIN_REQUIRED',
+      message: isPartial ? '✅ Valid Ticket: Partial Check-in Pending' : '✅ VALID TICKET: Full Check-in Pending',
       ticket,
-      remaining,
-      totalAllowed,
-      currentCheckedIn
+      remaining: {
+        couples: remainingCouples,
+        adults: remainingAdults,
+        children: remainingChildren
+      }
     });
 
   } catch (error) {
