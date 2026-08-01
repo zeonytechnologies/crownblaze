@@ -935,6 +935,8 @@ footer {
 .upi-modal-content {
   width: 90%;
   max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   padding: 30px;
   transform: scale(0.9);
