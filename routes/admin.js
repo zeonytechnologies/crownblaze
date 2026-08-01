@@ -104,6 +104,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     let todayBookings = 0;
     let onlineCount = 0;
     let offlineCount = 0;
+    let onlineRevenue = 0.0;
+    let offlineRevenue = 0.0;
     
     const categoryStats = {
       General: { adults: 0, couples: 0 },
@@ -125,8 +127,10 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       
       if (isOffline) {
         offlineCount += ticketsCount;
+        offlineRevenue += amount;
       } else {
         onlineCount += ticketsCount;
+        onlineRevenue += amount;
         
         // Only count online tickets for payment verification
         if (t.payment === 'Verified') {
@@ -199,6 +203,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         paymentPendingRevenue,
         onlineCount,
         offlineCount,
+        onlineRevenue,
+        offlineRevenue,
         categoryStats
       },
       recentBookings: recent || []
@@ -316,6 +322,65 @@ router.post('/attendance', adminAuth, async (req, res) => {
   } catch (error) {
     console.error('Error changing ticket attendance status:', error);
     res.status(500).json({ success: false, error: 'Failed to update attendance status.' });
+  }
+});
+
+// POST: /api/admin/offline-sold
+router.post('/offline-sold', adminAuth, async (req, res) => {
+  try {
+    const { ticketIds } = req.body;
+    if (!ticketIds || !Array.isArray(ticketIds) || ticketIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'ticketIds array is required.' });
+    }
+
+    const { data: tickets, error: fetchError } = await supabase
+      .from('tickets')
+      .select('ticket_id, category, booking_details')
+      .in('ticket_id', ticketIds);
+
+    if (fetchError) throw fetchError;
+
+    const prices = {
+      general: { adult: 349, couples: 599 },
+      silver: { adult: 449, couples: 799 },
+      gold: { adult: 599, couples: 1099 },
+      family: { pass: 2999 },
+      vip: { adult: 1999, couples: 3499 } // Adding VIP just in case, based on earlier dropdown
+    };
+
+    let updatedCount = 0;
+    
+    for (const ticket of tickets) {
+      let amount = 0;
+      const cat = (ticket.category || 'general').toLowerCase();
+      
+      if (cat === 'family') {
+        amount = prices.family.pass;
+      } else {
+        const bd = ticket.booking_details || {};
+        const type = bd.type || 'Adult';
+        if (type === 'Couple') {
+          amount = prices[cat]?.couples || prices.general.couples;
+        } else {
+          amount = prices[cat]?.adult || prices.general.adult;
+        }
+      }
+      
+      const { error: updateError } = await supabase
+        .from('tickets')
+        .update({ amount: amount, payment: 'Verified' })
+        .eq('ticket_id', ticket.ticket_id);
+        
+      if (!updateError) {
+        updatedCount++;
+      }
+    }
+
+    res.json({ success: true, message: `Successfully marked ${updatedCount} offline tickets as sold.` });
+
+  } catch (error) {
+    console.error('Error marking offline tickets as sold:', error);
+    res.status(500).json({ success: false, error: 'Failed to mark tickets as sold.' });
   }
 });
 

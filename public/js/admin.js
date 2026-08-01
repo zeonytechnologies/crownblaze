@@ -152,9 +152,13 @@ const loadDashboardStats = async () => {
       const statPendingRev = document.getElementById('stat-pending-revenue');
       const statOnlineCount = document.getElementById('stat-online-count');
       const statOfflineCount = document.getElementById('stat-offline-count');
+      const statOnlineRev = document.getElementById('stat-online-revenue');
+      const statOfflineRev = document.getElementById('stat-offline-revenue');
       
       if (statOnlineCount) statOnlineCount.innerText = data.stats.onlineCount || 0;
       if (statOfflineCount) statOfflineCount.innerText = data.stats.offlineCount || 0;
+      if (statOnlineRev) statOnlineRev.innerText = parseFloat(data.stats.onlineRevenue || 0).toFixed(2);
+      if (statOfflineRev) statOfflineRev.innerText = parseFloat(data.stats.offlineRevenue || 0).toFixed(2);
       
       if (statVerifiedCount) statVerifiedCount.innerText = data.stats.paymentVerifiedCount || 0;
       if (statVerifiedRev) statVerifiedRev.innerText = parseFloat(data.stats.paymentVerifiedRevenue || 0).toFixed(2);
@@ -265,26 +269,32 @@ const renderTicketsTable = (tickets) => {
 };
 
 const renderOfflineTicketsTable = (tickets) => {
+  window.currentOfflineTickets = tickets; // Save for download reference
   if (tickets.length === 0) {
-    offlineTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--color-text-secondary);">No offline tickets found.</td></tr>`;
+    offlineTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--color-text-secondary);">No offline tickets found.</td></tr>`;
     return;
   }
   
   offlineTableBody.innerHTML = tickets.map(t => {
-    const paymentClass = t.payment === 'Verified' ? 'badge success' : 'badge pending';
-    const typeLabel = t.booking_details ? t.booking_details.type : '-';
+    const isSold = parseFloat(t.amount || 0) > 0;
+    const statusClass = isSold ? 'badge success' : 'badge pending';
+    const statusText = isSold ? 'Sold' : 'Unsold';
+    const typeLabel = t.booking_details ? (t.booking_details.type || '-') : '-';
     
     return `
       <tr>
+        <td>
+          <input type="checkbox" class="offline-ticket-check" value="${t.ticket_id}" ${isSold ? 'disabled' : ''} style="cursor: ${isSold ? 'not-allowed' : 'pointer'}; width:16px; height:16px;">
+        </td>
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${t.ticket_id}</td>
         <td style="font-size: 0.75rem; color: var(--color-text-secondary);">${t.order_id || '-'}</td>
         <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${t.category}</span></td>
         <td>${typeLabel}</td>
         <td style="font-weight: 600;">${t.ticket_count}</td>
-        <td><span class="${paymentClass}">${t.payment || 'Pending'}</span></td>
+        <td><span class="${statusClass}">${statusText}</span></td>
         <td>
           <div style="display:flex; gap:10px;">
-            ${t.payment !== 'Verified' ? `<button onclick="quickVerifyPayment('${t.ticket_id}', 'Verified')" class="btn-glow" style="padding: 6px 12px; font-size:0.8rem; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-check"></i> Verify Cash</button>` : `<span style="color:#00ff88; font-size: 0.85rem; padding: 6px 0;"><i class="fa-solid fa-check-double"></i> Collected</span>`}
+            <button onclick="downloadOfflineTicket('${t.ticket_id}')" class="btn-glow" style="padding: 6px 12px; font-size:0.8rem; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-download"></i> Download</button>
             <button onclick="viewTicketDetails('${t.ticket_id}')" class="btn-secondary" style="padding: 6px 12px; font-size:0.8rem; border-color: var(--glass-border); color: #fff;">
               Details
             </button>
@@ -293,6 +303,10 @@ const renderOfflineTicketsTable = (tickets) => {
       </tr>
     `;
   }).join('');
+  
+  if (typeof attachOfflineCheckboxListeners === 'function') {
+    attachOfflineCheckboxListeners();
+  }
 };
 
 // Toggle Attendance (manual from list)
@@ -601,6 +615,73 @@ document.getElementById('btn-export-excel').addEventListener('click', async () =
   } catch (err) {
     console.error('Export error:', err);
     showToast('Failed to export tickets.', 'error');
+  }
+});
+
+// Offline Ticket Handlers
+window.downloadOfflineTicket = (ticketId) => {
+  if (!window.currentOfflineTickets) return;
+  const ticket = window.currentOfflineTickets.find(t => t.ticket_id === ticketId);
+  if (ticket) {
+    sessionStorage.setItem('bulkTickets', JSON.stringify([ticket]));
+    window.open('/print-bulk.html', '_blank');
+  }
+};
+
+window.attachOfflineCheckboxListeners = () => {
+  const checkAll = document.getElementById('check-all-offline');
+  const checkBoxes = document.querySelectorAll('.offline-ticket-check:not(:disabled)');
+  const btnMarkSold = document.getElementById('btn-mark-sold');
+  
+  if (!checkAll || !btnMarkSold) return;
+  
+  const updateBtnVisibility = () => {
+    const checkedCount = document.querySelectorAll('.offline-ticket-check:checked:not(:disabled)').length;
+    btnMarkSold.style.display = checkedCount > 0 ? 'block' : 'none';
+  };
+
+  checkAll.addEventListener('change', (e) => {
+    const isChecked = e.target.checked;
+    checkBoxes.forEach(cb => {
+      cb.checked = isChecked;
+    });
+    updateBtnVisibility();
+  });
+  
+  checkBoxes.forEach(cb => {
+    cb.addEventListener('change', updateBtnVisibility);
+  });
+};
+
+document.getElementById('btn-mark-sold')?.addEventListener('click', async () => {
+  const checkedBoxes = document.querySelectorAll('.offline-ticket-check:checked:not(:disabled)');
+  const ticketIds = Array.from(checkedBoxes).map(cb => cb.value);
+  
+  if (ticketIds.length === 0) return;
+  
+  if (!confirm(`Are you sure you want to mark ${ticketIds.length} offline tickets as sold? This will reflect in the total revenue.`)) return;
+  
+  try {
+    const response = await fetch('/api/admin/offline-sold', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ ticketIds })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      loadTickets();
+      updateDashboardStats();
+    } else {
+      showToast(data.error || 'Failed to mark tickets as sold.', 'error');
+    }
+  } catch (err) {
+    console.error('Error marking as sold:', err);
+    showToast('Server error.', 'error');
   }
 });
 

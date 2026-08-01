@@ -73,6 +73,9 @@
         <div class="glass-card stat-card revenue">
           <h3>Total Revenue</h3>
           <span class="value">₹<span id="stat-revenue">0.00</span></span>
+          <div style="font-size: 0.85rem; color: #ccc; margin-top: 5px; font-weight: 500;">
+            Online: ₹<span id="stat-online-revenue">0.00</span> &nbsp;|&nbsp; Offline: ₹<span id="stat-offline-revenue">0.00</span>
+          </div>
         </div>
         <div class="glass-card stat-card checked" style="border-color: #00ff88;">
           <h3>Payment Verified</h3>
@@ -198,9 +201,14 @@
 
         <!-- Offline Table -->
         <div class="table-wrapper" id="offline-table-wrapper" style="display: none;">
+          <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--color-text-secondary); font-size: 0.9rem;">Select unsold tickets to mark them as sold.</span>
+            <button id="btn-mark-sold" class="btn-glow" style="padding: 8px 16px; border-color: #ffd700; color: #ffd700; display: none;">Mark Selected as Sold</button>
+          </div>
           <table>
             <thead>
               <tr>
+                <th style="width: 40px;"><input type="checkbox" id="check-all-offline" style="cursor:pointer; width:16px; height:16px;"></th>
                 <th>Ticket ID</th>
                 <th>Order Ref</th>
                 <th>Category</th>
@@ -212,7 +220,7 @@
             </thead>
             <tbody id="offline-tickets-table-body">
               <tr>
-                <td colspan="7" style="text-align: center; color: var(--color-text-secondary);">Loading offline tickets...</td>
+                <td colspan="8" style="text-align: center; color: var(--color-text-secondary);">Loading offline tickets...</td>
               </tr>
             </tbody>
           </table>
