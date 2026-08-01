@@ -651,6 +651,53 @@ window.attachOfflineCheckboxListeners = () => {
   checkBoxes.forEach(cb => {
     cb.addEventListener('change', updateBtnVisibility);
   });
+  
+  const btnAutoSelect = document.getElementById('btn-auto-select');
+  if (btnAutoSelect) {
+    btnAutoSelect.onclick = () => {
+      const cat = document.getElementById('auto-select-category').value;
+      const type = document.getElementById('auto-select-type').value;
+      const count = parseInt(document.getElementById('auto-select-count').value, 10);
+      
+      if (!count || count <= 0) {
+        showToast('Please enter a valid quantity.', 'error');
+        return;
+      }
+      
+      // Clear existing
+      checkBoxes.forEach(cb => cb.checked = false);
+      if (checkAll) checkAll.checked = false;
+      
+      let selectedCount = 0;
+      for (const cb of checkBoxes) {
+        if (cb.disabled) continue;
+        
+        const ticketId = cb.value;
+        const ticketData = window.currentOfflineTickets?.find(t => t.ticket_id === ticketId);
+        
+        if (ticketData) {
+          const tCat = ticketData.category || 'General';
+          const tType = ticketData.booking_details ? (ticketData.booking_details.type || 'Adult') : 'Adult';
+          
+          if (tCat.toLowerCase() === cat.toLowerCase() && tType.toLowerCase() === type.toLowerCase()) {
+            cb.checked = true;
+            selectedCount++;
+            if (selectedCount === count) break;
+          }
+        }
+      }
+      
+      updateBtnVisibility();
+      
+      if (selectedCount === 0) {
+        showToast(`No unsold tickets found for ${cat} - ${type}.`, 'error');
+      } else if (selectedCount < count) {
+        showToast(`Only ${selectedCount} unsold tickets available for ${cat} - ${type}.`, 'info');
+      } else {
+        showToast(`Selected ${selectedCount} tickets.`, 'success');
+      }
+    };
+  }
 };
 
 document.getElementById('btn-mark-sold')?.addEventListener('click', async () => {
