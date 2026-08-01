@@ -106,8 +106,8 @@ const displayScanResult = (data) => {
     resTime.innerText = new Date(ticket.booked_at).toLocaleString();
     resScanTime.innerText = ticket.checked_in_at ? new Date(ticket.checked_in_at).toLocaleString() : 'N/A';
 
-  } else if (data.success && data.status === 'PARTIAL_CHECKIN_REQUIRED') {
-    // PARTIAL CHECKIN REQUIRED
+  } else if (data.success && (data.status === 'PARTIAL_CHECKIN_REQUIRED' || data.status === 'VALID')) {
+    // PARTIAL CHECKIN REQUIRED OR VALID
     resultCard.classList.add('status-valid');
     resultIcon.innerHTML = '<i class="fa-solid fa-list-check" style="color: #00ff66;"></i>';
     resultTitle.innerText = 'SELECT GUESTS';

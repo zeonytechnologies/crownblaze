@@ -161,10 +161,29 @@
         </div>
         
         <!-- Controls Panel -->
-        <div class="control-panel">
-          <input type="text" id="ticket-search" class="form-control search-input" placeholder="Search by name, phone, ticket ID, or payment ID...">
+        <div class="control-panel" style="flex-wrap: wrap; gap: 15px;">
+          <input type="text" id="ticket-search" class="form-control search-input" style="flex: 1; min-width: 250px;" placeholder="Search by name, phone, ticket ID...">
           
-          <div style="display: flex; gap: 10px;">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="filter-category" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="General">General</option>
+              <option value="Silver">Silver</option>
+              <option value="Gold">Gold</option>
+              <option value="VIP">VIP</option>
+              <option value="Family">Family</option>
+            </select>
+            <select id="filter-type" class="filter-select">
+              <option value="all">All Types</option>
+              <option value="Adult">Adult</option>
+              <option value="Couple">Couple</option>
+              <option value="Family Pass">Family Pass</option>
+            </select>
+            <select id="filter-status" class="filter-select">
+              <option value="all">All Status (Sold/Unsold)</option>
+              <option value="sold">Sold</option>
+              <option value="unsold">Unsold</option>
+            </select>
             <select id="filter-attendance" class="filter-select">
               <option value="all">All Attendance</option>
               <option value="true">Checked In Only</option>

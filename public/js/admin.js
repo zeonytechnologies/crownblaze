@@ -189,11 +189,18 @@ const loadDashboardStats = async () => {
 const loadTickets = async () => {
   try {
     const searchVal = searchInput.value.trim();
-    const attendanceVal = filterSelect.value;
+    const attendanceVal = filterSelect.value; // ID is filter-attendance
+    const categoryVal = document.getElementById('filter-category')?.value || 'all';
+    const typeVal = document.getElementById('filter-type')?.value || 'all';
+    const statusVal = document.getElementById('filter-status')?.value || 'all';
+    
     let url = `/api/admin/tickets?page=${currentPage}&limit=${limit}&type=${activeTab}`;
 
     if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
     if (attendanceVal !== 'all') url += `&attendance=${attendanceVal}`;
+    if (categoryVal !== 'all') url += `&category=${categoryVal}`;
+    if (typeVal !== 'all') url += `&ticketType=${typeVal}`;
+    if (statusVal !== 'all') url += `&status=${statusVal}`;
 
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -496,9 +503,14 @@ searchInput.addEventListener('input', () => {
   }, 400);
 });
 
-filterSelect.addEventListener('change', () => {
-  currentPage = 1;
-  loadTickets();
+['filter-attendance', 'filter-category', 'filter-type', 'filter-status'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', () => {
+      currentPage = 1;
+      loadTickets();
+    });
+  }
 });
 
 // Token expire handler

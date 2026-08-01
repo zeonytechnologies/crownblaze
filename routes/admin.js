@@ -219,7 +219,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
 // GET: /api/admin/tickets
 router.get('/tickets', adminAuth, async (req, res) => {
   try {
-    const { search, attendance, page = 1, limit = 10, type = 'online' } = req.query;
+    const { search, attendance, category, ticketType, status, page = 1, limit = 10, type = 'online' } = req.query;
 
     let query = supabase.from('tickets').select('*', { count: 'exact' });
 
@@ -239,6 +239,23 @@ router.get('/tickets', adminAuth, async (req, res) => {
       query = query.eq('attendance', true);
     } else if (attendance === 'false') {
       query = query.eq('attendance', false);
+    }
+    
+    // Handle Category Filter
+    if (category) {
+      query = query.eq('category', category);
+    }
+
+    // Handle Type Filter
+    if (ticketType) {
+      query = query.eq('booking_details->>type', ticketType);
+    }
+
+    // Handle Status (Sold/Unsold)
+    if (status === 'sold') {
+      query = query.gt('amount', 0);
+    } else if (status === 'unsold') {
+      query = query.eq('amount', 0);
     }
 
     // Pagination
@@ -581,20 +598,25 @@ router.post('/verify-manual', scannerAuth, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Ticket ID or Phone Number is required.' });
     }
 
-    const { data: ticket, error } = await supabase
+    const { data: tickets, error } = await supabase
       .from('tickets')
       .select('*')
-      .or(`ticket_id.eq.${identifier},phone.eq.${identifier}`)
-      .maybeSingle();
+      .or(`ticket_id.eq."${identifier}",phone.eq."${identifier}"`);
 
     if (error) throw error;
 
-    if (!ticket) {
+    if (!tickets || tickets.length === 0) {
       return res.json({
         success: false,
         status: 'INVALID',
         message: '❌ Invalid Ticket: No record found for that ID or Phone Number.'
       });
+    }
+
+    // If phone number matches multiple tickets, try to pick one that is not checked in yet
+    let ticket = tickets.find(t => !t.attendance);
+    if (!ticket) {
+      ticket = tickets[0];
     }
 
     if (ticket.payment !== 'Verified') {
@@ -623,7 +645,7 @@ router.post('/verify-manual', scannerAuth, async (req, res) => {
     // We fetch current checked in logs for this ticket
     const { data: logs, error: logsError } = await supabase
       .from('attendance_logs')
-      .select('headcount')
+      .select('ticket_id')
       .eq('ticket_id', ticket.ticket_id);
       
     if (logsError) throw logsError;
