@@ -510,13 +510,9 @@
           <i class="fa-solid fa-download" style="font-size: 1.2rem;"></i> DOWNLOAD QR CODE
         </button>
       </div>
-      <p style="color: #ccc; font-size: 0.85rem; margin-bottom: 25px; text-align: left; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-        <strong>How to pay on mobile:</strong><br/>
-        1. Download or Screenshot the QR code above.<br/>
-        2. Open your UPI app (GPay / PhonePe / Paytm).<br/>
-        3. Tap the QR Scanner icon.<br/>
-        4. Select "Scan from Gallery" and choose the QR code.
-      </p>
+      <div style="margin-bottom: 25px; text-align: left;">
+        <button type="button" id="btn-show-mobile-pay-guide" style="font-size: 0.85rem; color: var(--color-neon-blue); cursor: pointer; text-decoration: underline; background: transparent; border: none; padding: 0;">How to pay on mobile?</button>
+      </div>
 
       <div class="form-group" style="margin-bottom: 20px; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -575,6 +571,37 @@
         <!-- Content will be injected here -->
       </div>
       <button class="btn-glow" style="width: 100%; margin-top: 25px;" onclick="document.getElementById('policy-modal').classList.remove('active')">Close</button>
+    </div>
+  </div>
+
+  <!-- Mobile Pay Guide Modal -->
+  <div id="mobile-pay-guide-modal" class="upi-modal-overlay" style="z-index: 2200;">
+    <div class="upi-modal-content glass-card" style="max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: left;">
+      <h3 style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title); display: flex; justify-content: space-between; align-items: center;">
+        How to pay on mobile
+        <i class="fa-solid fa-xmark" style="cursor: pointer; color: #fff;" onclick="document.getElementById('mobile-pay-guide-modal').classList.remove('active')"></i>
+      </h3>
+      <div style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6;">
+        <p>1. Download or Screenshot the QR code.</p>
+        <p>2. Open your UPI app (GPay / PhonePe / Paytm).</p>
+        <p>3. Tap the QR Scanner icon.</p>
+        <p>4. Select "Scan from Gallery" and choose the QR code.</p>
+      </div>
+      <button class="btn-glow" style="width: 100%; margin-top: 25px;" onclick="document.getElementById('mobile-pay-guide-modal').classList.remove('active')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Cancel Confirmation Modal -->
+  <div id="cancel-confirm-modal" class="upi-modal-overlay" style="z-index: 2300;">
+    <div class="upi-modal-content glass-card" style="max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: center;">
+      <h3 style="color: var(--color-neon-blue); margin-bottom: 15px; font-family: var(--font-title);">Cancel Booking?</h3>
+      <p style="color: var(--color-text-secondary); margin-bottom: 25px; line-height: 1.6; font-size: 1.05rem;">
+        Are you sure you want to exit? Your booking progress will be lost.
+      </p>
+      <div style="display: flex; gap: 15px;">
+        <button id="btn-stay-payment" class="btn-glow" style="flex: 1;">No, Stay</button>
+        <button id="btn-confirm-cancel-payment" class="btn-glow" style="background: transparent; color: var(--color-text-primary); flex: 1; border: 1px solid #ff3366;">Yes, Exit</button>
+      </div>
     </div>
   </div>
 

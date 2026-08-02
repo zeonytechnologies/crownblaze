@@ -72,7 +72,28 @@ document.addEventListener('click', (e) => {
   }
 });
 
-btnCancelUpi.addEventListener('click', closeUpiModal);
+// Mobile Pay Guide Modal Toggle Logic
+document.getElementById('btn-show-mobile-pay-guide')?.addEventListener('click', () => {
+  const modal = document.getElementById('mobile-pay-guide-modal');
+  if (modal) modal.classList.add('active');
+});
+
+// Cancel Booking Confirmation Logic
+btnCancelUpi.addEventListener('click', () => {
+  const confirmModal = document.getElementById('cancel-confirm-modal');
+  if (confirmModal) confirmModal.classList.add('active');
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-stay-payment') {
+    const confirmModal = document.getElementById('cancel-confirm-modal');
+    if (confirmModal) confirmModal.classList.remove('active');
+  } else if (e.target.id === 'btn-confirm-cancel-payment') {
+    const confirmModal = document.getElementById('cancel-confirm-modal');
+    if (confirmModal) confirmModal.classList.remove('active');
+    closeUpiModal();
+  }
+});
 
 const handleBookingSubmit = (e) => {
   e.preventDefault();
