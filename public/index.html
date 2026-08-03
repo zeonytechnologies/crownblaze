@@ -519,7 +519,7 @@
           <label for="upi-utr" style="margin-bottom: 0;"><i class="fa-solid fa-hashtag"></i> Transaction ID (UTR)</label>
           <span id="btn-show-utr-guide" style="font-size: 0.75rem; color: var(--color-neon-blue); cursor: pointer; text-decoration: underline;">How to find UTR?</span>
         </div>
-        <input type="text" id="upi-utr" class="form-control" placeholder="Enter 12-digit UTR after payment" maxlength="12" />
+        <input type="text" id="upi-utr" class="form-control" placeholder="Enter 12-digit UTR after payment" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
         <small style="color: var(--color-text-secondary); font-size: 0.8rem; margin-top: 5px; display: block;">After paying, manually enter the 12-digit reference number here.</small>
       </div>
 

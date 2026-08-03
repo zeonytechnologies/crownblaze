@@ -16,19 +16,21 @@ router.post('/submit-booking', async (req, res) => {
     } = req.body;
 
     if (!transaction_id || !name || !email || !phone || !ticketCounts) {
+      console.log('400 Error: Missing details:', { transaction_id, name, email, phone, ticketCounts });
       return res.status(400).json({ success: false, error: 'Missing booking details or Transaction ID.' });
     }
 
     // Prevent duplicate entries using transaction_id (UTR) or phone
-    const { data: existingTicket } = await supabase
+    const { data: existingTicket, error: checkError } = await supabase
       .from('tickets')
       .select('ticket_id, phone, payment_id')
-      .or(`payment_id.eq.${transaction_id},phone.eq.${phone}`)
+      .or(`payment_id.eq."${transaction_id}",phone.eq."${phone}"`)
       .maybeSingle();
 
     if (existingTicket) {
       let conflictMsg = 'A booking with this UTR number already exists.';
       if (existingTicket.phone === phone) conflictMsg = 'A booking with this Phone Number already exists.';
+      console.log('400 Error: Duplicate ticket:', conflictMsg, existingTicket);
       return res.status(400).json({ success: false, error: conflictMsg });
     }
 

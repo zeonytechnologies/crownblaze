@@ -165,8 +165,8 @@ const handleBookingSubmit = (e) => {
 btnVerifyUpi.addEventListener('click', async () => {
   const transactionId = upiUtrInput.value.trim();
   
-  if (!transactionId || transactionId.length < 10) {
-    showToast('Please enter a valid Transaction ID / UTR.', 'error');
+  if (!transactionId || !/^\d{12}$/.test(transactionId)) {
+    showToast('Please enter a valid 12-digit Transaction ID (UTR).', 'error');
     return;
   }
 
