@@ -264,7 +264,6 @@ const renderTicketsTable = (tickets) => {
         <td style="font-weight: 600;">${ticket.ticket_count}</td>
         <td>₹${parseFloat(ticket.amount).toFixed(2)}</td>
         <td><span class="${paymentClass}" style="${ticket.payment === 'Rejected' ? 'color:#ff3366; border-color:#ff3366;' : ''}">${ticket.payment || 'Not Verified'}</span></td>
-        <td><span class="${statusClass}">${statusText}</span></td>
         <td>
           <div style="display:flex; gap:10px;">
             ${ticket.payment !== 'Verified' ? `<button onclick="quickVerifyPayment('${ticket.ticket_id}', 'Verified')" class="btn-glow" style="padding: 6px 12px; font-size:0.8rem; border-color: #00ff88; color: #00ff88; background: transparent;"><i class="fa-solid fa-check"></i> Verify</button>` : ''}
@@ -276,6 +275,7 @@ const renderTicketsTable = (tickets) => {
             </button>
           </div>
         </td>
+        <td><span class="${statusClass}">${statusText}</span></td>
       </tr>
     `;
   }).join('');
