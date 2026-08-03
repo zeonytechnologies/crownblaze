@@ -192,8 +192,9 @@
 
       <!-- Action Buttons -->
       <div class="action-row">
-        <button class="btn-glow" id="btn-print"><i class="fa-solid fa-print"></i> Print Ticket</button>
-        <button class="btn-secondary" id="btn-download"><i class="fa-solid fa-download"></i> Download (PDF)</button>
+        <button class="btn-glow" id="btn-print"><i class="fa-solid fa-print"></i> Print</button>
+        <button class="btn-glow" id="btn-share" style="border-color: #00ff88; color: #00ff88;"><i class="fa-solid fa-share-nodes"></i> Share</button>
+        <button class="btn-secondary" id="btn-download"><i class="fa-solid fa-download"></i> Download</button>
       </div>
 
     </div>
@@ -203,6 +204,7 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     // Toast notification function helper
     const showToast = (message, type = 'info') => {
@@ -268,6 +270,53 @@
       // Download Button Handler (Redirects to system print to save as PDF)
       document.getElementById('btn-download').addEventListener('click', () => {
         window.print();
+      });
+
+      // Share Button Handler
+      document.getElementById('btn-share').addEventListener('click', async () => {
+        try {
+          const btn = document.getElementById('btn-share');
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+          btn.disabled = true;
+
+          // Capture the ticket visually
+          const ticketElement = document.getElementById('ticket-content');
+          const canvas = await html2canvas(ticketElement, { backgroundColor: '#0f0f13', scale: 2 });
+          
+          canvas.toBlob(async (blob) => {
+            const file = new File([blob], `CrownBeatz_Ticket_${ticketId}.png`, { type: 'image/png' });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: 'CrownBeatz Ticket',
+                text: `Here is my CrownBeatz Event Ticket! Ticket ID: ${ticketId}`,
+                files: [file]
+              });
+              showToast('Thanks for sharing!', 'success');
+            } else if (navigator.share) {
+              // Fallback to URL if file sharing is not supported
+              await navigator.share({
+                title: 'CrownBeatz Ticket',
+                text: `Check out my CrownBeatz Event Ticket! Ticket ID: ${ticketId}`,
+                url: window.location.href,
+              });
+              showToast('Thanks for sharing!', 'success');
+            } else {
+              // Fallback to clipboard
+              navigator.clipboard.writeText(window.location.href);
+              showToast('Ticket URL copied to clipboard!', 'success');
+            }
+            
+            btn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Share';
+            btn.disabled = false;
+          }, 'image/png');
+        } catch (err) {
+          console.error('Error sharing:', err);
+          showToast('Failed to share ticket.', 'error');
+          const btn = document.getElementById('btn-share');
+          btn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Share';
+          btn.disabled = false;
+        }
       });
     });
   </script>
