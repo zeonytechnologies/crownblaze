@@ -201,6 +201,11 @@ const loadTickets = async () => {
     if (categoryVal !== 'all') url += `&category=${categoryVal}`;
     if (typeVal !== 'all') url += `&ticketType=${typeVal}`;
     if (statusVal !== 'all') url += `&status=${statusVal}`;
+    
+    const dateFilter = document.getElementById('filter-date');
+    if (dateFilter && dateFilter.value) {
+      url += `&date=${dateFilter.value}`;
+    }
 
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -248,6 +253,7 @@ const renderTicketsTable = (tickets) => {
     return `
       <tr>
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${ticket.ticket_id}</td>
+        <td>${ticket.booked_at ? new Date(ticket.booked_at).toLocaleDateString() : '-'}</td>
         <td style="font-size: 0.75rem; color: var(--color-text-secondary); word-break: break-all; max-width: 100px;">${ticket.payment_id || '-'}</td>
         <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${ticket.category || 'General'}</span></td>
         <td>
@@ -294,6 +300,7 @@ const renderOfflineTicketsTable = (tickets) => {
           <input type="checkbox" class="offline-ticket-check" value="${t.ticket_id}" ${isSold ? 'disabled' : ''} style="cursor: ${isSold ? 'not-allowed' : 'pointer'}; width:16px; height:16px;">
         </td>
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${t.ticket_id}</td>
+        <td>${t.booked_at ? new Date(t.booked_at).toLocaleDateString() : '-'}</td>
         <td style="font-size: 0.75rem; color: var(--color-text-secondary);">${t.order_id || '-'}</td>
         <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${t.category}</span></td>
         <td>${typeLabel}</td>
@@ -570,6 +577,11 @@ window.quickVerifyPayment = async (ticketId, status) => {
   }
 };
 
+document.getElementById('filter-type').addEventListener('change', () => { currentPage = 1; loadTickets(); });
+document.getElementById('filter-status').addEventListener('change', () => { currentPage = 1; loadTickets(); });
+document.getElementById('filter-attendance').addEventListener('change', () => { currentPage = 1; loadTickets(); });
+document.getElementById('filter-date')?.addEventListener('change', () => { currentPage = 1; loadTickets(); });
+
 document.getElementById('btn-modal-verify-payment').addEventListener('click', () => handlePaymentVerification('Verified'));
 document.getElementById('btn-modal-reject-payment').addEventListener('click', () => handlePaymentVerification('Rejected'));
 
@@ -578,10 +590,12 @@ document.getElementById('btn-export-excel').addEventListener('click', async () =
   try {
     const searchVal = searchInput.value.trim();
     const attendanceVal = filterSelect.value;
+    const dateVal = document.getElementById('filter-date')?.value;
     let url = `/api/admin/tickets?page=1&limit=all`;
 
     if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
     if (attendanceVal !== 'all') url += `&attendance=${attendanceVal}`;
+    if (dateVal) url += `&date=${dateVal}`;
 
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${adminToken}` }

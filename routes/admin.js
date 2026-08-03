@@ -219,7 +219,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
 // GET: /api/admin/tickets
 router.get('/tickets', adminAuth, async (req, res) => {
   try {
-    const { search, attendance, category, ticketType, status, page = 1, limit = 10, type = 'online' } = req.query;
+    const { search, attendance, category, ticketType, status, date, page = 1, limit = 10, type = 'online' } = req.query;
 
     let query = supabase.from('tickets').select('*', { count: 'exact' });
 
@@ -256,6 +256,14 @@ router.get('/tickets', adminAuth, async (req, res) => {
       query = query.gt('amount', 0);
     } else if (status === 'unsold') {
       query = query.eq('amount', 0);
+    }
+
+    // Handle Date Filter
+    if (date) {
+      // date is in 'YYYY-MM-DD'
+      const startOfDay = new Date(date + 'T00:00:00').toISOString();
+      const endOfDay = new Date(date + 'T23:59:59').toISOString();
+      query = query.gte('booked_at', startOfDay).lte('booked_at', endOfDay);
     }
 
     // Pagination

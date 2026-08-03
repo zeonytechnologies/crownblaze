@@ -189,6 +189,7 @@
               <option value="true">Checked In Only</option>
               <option value="false">Pending Only</option>
             </select>
+            <input type="date" id="filter-date" class="form-control filter-select" style="height: 38px; padding: 0 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; border-radius: 6px;">
             <button id="btn-export-excel" class="btn-glow" style="padding: 10px 20px;"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
           </div>
         </div>
@@ -199,6 +200,7 @@
             <thead>
               <tr>
                 <th>Ticket ID</th>
+                <th>Date</th>
                 <th>UTR</th>
                 <th>Category</th>
                 <th>Customer</th>
@@ -212,7 +214,7 @@
             </thead>
             <tbody id="tickets-table-body">
               <tr>
-                <td colspan="10" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
+                <td colspan="11" style="text-align: center; color: var(--color-text-secondary);">Loading ticket records...</td>
               </tr>
             </tbody>
           </table>
@@ -248,6 +250,7 @@
               <tr>
                 <th style="width: 40px;"><input type="checkbox" id="check-all-offline" style="cursor:pointer; width:16px; height:16px;"></th>
                 <th>Ticket ID</th>
+                <th>Date</th>
                 <th>Order Ref</th>
                 <th>Category</th>
                 <th>Type</th>
@@ -258,7 +261,7 @@
             </thead>
             <tbody id="offline-tickets-table-body">
               <tr>
-                <td colspan="8" style="text-align: center; color: var(--color-text-secondary);">Loading offline tickets...</td>
+                <td colspan="9" style="text-align: center; color: var(--color-text-secondary);">Loading offline tickets...</td>
               </tr>
             </tbody>
           </table>
