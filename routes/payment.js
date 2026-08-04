@@ -90,10 +90,15 @@ router.post('/submit-booking', async (req, res) => {
 
     const combinedCategoryStr = categoryParts.join(' | ') || 'General';
 
-    // Enforcement of Silver and Gold Capacity Limits
+    // Enforcement of Capacity Limits
+    let requestedGeneral = 0;
     let requestedSilver = 0;
     let requestedGold = 0;
     let requestedFamily = 0;
+    
+    if (ticketCounts.general) {
+      requestedGeneral = (parseInt(ticketCounts.general.couples)||0)*2 + (parseInt(ticketCounts.general.adult)||0) + (parseInt(ticketCounts.general.child)||0);
+    }
     if (ticketCounts.silver) {
       requestedSilver = (parseInt(ticketCounts.silver.couples)||0)*2 + (parseInt(ticketCounts.silver.adult)||0) + (parseInt(ticketCounts.silver.child)||0);
     }
@@ -104,15 +109,19 @@ router.post('/submit-booking', async (req, res) => {
       requestedFamily = parseInt(ticketCounts.family.pass)||0;
     }
 
-    if (requestedSilver > 0 || requestedGold > 0 || requestedFamily > 0) {
+    if (requestedGeneral > 0 || requestedSilver > 0 || requestedGold > 0 || requestedFamily > 0) {
       const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment');
       const validTickets = (currentTickets || []).filter(t => t.payment !== 'Rejected');
       
+      let generalUsed = 0;
       let silverUsed = 0;
       let goldUsed = 0;
       let familyUsed = 0;
       validTickets.forEach(t => {
         if (t.booking_details) {
+          if (t.booking_details.general) {
+             generalUsed += (parseInt(t.booking_details.general.couples)||0)*2 + (parseInt(t.booking_details.general.adult)||0) + (parseInt(t.booking_details.general.child)||0);
+          }
           if (t.booking_details.silver) {
              silverUsed += (parseInt(t.booking_details.silver.couples)||0)*2 + (parseInt(t.booking_details.silver.adult)||0) + (parseInt(t.booking_details.silver.child)||0);
           }
@@ -125,6 +134,9 @@ router.post('/submit-booking', async (req, res) => {
         }
       });
       
+      if (requestedGeneral > (2500 - generalUsed)) {
+         return res.status(400).json({ success: false, error: `Not enough General seats available. Only ${Math.max(0, 2500 - generalUsed)} left.` });
+      }
       if (requestedSilver > (250 - silverUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only ${Math.max(0, 250 - silverUsed)} left.` });
       }
