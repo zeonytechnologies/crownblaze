@@ -124,6 +124,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     startOfToday.setHours(0, 0, 0, 0);
 
     (sumData || []).forEach(t => {
+      if (t.payment === 'Rejected') return;
+      
       const ticketsCount = t.ticket_count || 0;
       const amount = parseFloat(t.amount || 0);
       totalTickets += ticketsCount;

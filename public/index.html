@@ -515,6 +515,18 @@
       </div>
 
       <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+        <style>
+          @keyframes blink-warning {
+            0% { opacity: 1; box-shadow: 0 0 5px rgba(255,51,102,0.2); }
+            50% { opacity: 0.85; box-shadow: 0 0 15px rgba(255,51,102,0.6); background-color: rgba(255,51,102,0.15); }
+            100% { opacity: 1; box-shadow: 0 0 5px rgba(255,51,102,0.2); }
+          }
+        </style>
+        <div style="background-color: rgba(255, 51, 102, 0.08); border: 1px solid #ff3366; padding: 10px; border-radius: 6px; margin-bottom: 12px; animation: blink-warning 1.5s infinite; text-align: center;">
+          <small style="color: #ff3366; font-size: 0.9rem; display: block; font-weight: bold; letter-spacing: 0.5px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> DON'T ENTER FAKE UTR NUMBER! 100 %THE TICKET WILL BE REJECTED.
+          </small>
+        </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <label for="upi-utr" style="margin-bottom: 0;"><i class="fa-solid fa-hashtag"></i> Transaction ID (UTR)</label>
           <span id="btn-show-utr-guide" style="font-size: 0.75rem; color: var(--color-neon-blue); cursor: pointer; text-decoration: underline;">How to find UTR?</span>
