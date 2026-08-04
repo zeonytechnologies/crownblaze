@@ -165,16 +165,29 @@ const loadDashboardStats = async () => {
       if (statPendingCount) statPendingCount.innerText = data.stats.paymentPendingCount || 0;
       if (statPendingRev) statPendingRev.innerText = parseFloat(data.stats.paymentPendingRevenue || 0).toFixed(2);
       
-      const cats = data.stats.categoryStats;
-      if (cats) {
-        document.getElementById('cat-gen-adult').innerText = cats.General.adults;
-        document.getElementById('cat-gen-couple').innerText = cats.General.couples;
-        document.getElementById('cat-sil-adult').innerText = cats.Silver.adults;
-        document.getElementById('cat-sil-couple').innerText = cats.Silver.couples;
-        document.getElementById('cat-gol-adult').innerText = cats.Gold.adults;
-        document.getElementById('cat-gol-couple').innerText = cats.Gold.couples;
-        if (cats.Family && document.getElementById('cat-fam-pass')) {
-          document.getElementById('cat-fam-pass').innerText = cats.Family.pass;
+      const onlineCats = data.stats.onlineCategoryStats;
+      if (onlineCats) {
+        document.getElementById('online-cat-gen-adult').innerText = onlineCats.General.adults;
+        document.getElementById('online-cat-gen-couple').innerText = onlineCats.General.couples;
+        document.getElementById('online-cat-sil-adult').innerText = onlineCats.Silver.adults;
+        document.getElementById('online-cat-sil-couple').innerText = onlineCats.Silver.couples;
+        document.getElementById('online-cat-gol-adult').innerText = onlineCats.Gold.adults;
+        document.getElementById('online-cat-gol-couple').innerText = onlineCats.Gold.couples;
+        if (onlineCats.Family && document.getElementById('online-cat-fam-pass')) {
+          document.getElementById('online-cat-fam-pass').innerText = onlineCats.Family.pass;
+        }
+      }
+
+      const offlineCats = data.stats.offlineCategoryStats;
+      if (offlineCats) {
+        document.getElementById('offline-cat-gen-adult').innerText = offlineCats.General.adults;
+        document.getElementById('offline-cat-gen-couple').innerText = offlineCats.General.couples;
+        document.getElementById('offline-cat-sil-adult').innerText = offlineCats.Silver.adults;
+        document.getElementById('offline-cat-sil-couple').innerText = offlineCats.Silver.couples;
+        document.getElementById('offline-cat-gol-adult').innerText = offlineCats.Gold.adults;
+        document.getElementById('offline-cat-gol-couple').innerText = offlineCats.Gold.couples;
+        if (offlineCats.Family && document.getElementById('offline-cat-fam-pass')) {
+          document.getElementById('offline-cat-fam-pass').innerText = offlineCats.Family.pass;
         }
       }
     } else {

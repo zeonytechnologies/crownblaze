@@ -107,7 +107,13 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     let onlineRevenue = 0.0;
     let offlineRevenue = 0.0;
     
-    const categoryStats = {
+    const onlineCategoryStats = {
+      General: { adults: 0, couples: 0 },
+      Silver: { adults: 0, couples: 0 },
+      Gold: { adults: 0, couples: 0 },
+      Family: { pass: 0 }
+    };
+    const offlineCategoryStats = {
       General: { adults: 0, couples: 0 },
       Silver: { adults: 0, couples: 0 },
       Gold: { adults: 0, couples: 0 },
@@ -144,28 +150,36 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       
       // Parse multi-category breakdown from JSON column
       if (t.booking_details) {
+        const statsObj = isOffline ? offlineCategoryStats : onlineCategoryStats;
         if (t.booking_details.general) {
-          categoryStats.General.adults += parseInt(t.booking_details.general.adult) || 0;
-          categoryStats.General.couples += parseInt(t.booking_details.general.couples) || 0;
+          statsObj.General.adults += parseInt(t.booking_details.general.adult) || 0;
+          statsObj.General.couples += parseInt(t.booking_details.general.couples) || 0;
         }
         if (t.booking_details.silver) {
-          categoryStats.Silver.adults += parseInt(t.booking_details.silver.adult) || 0;
-          categoryStats.Silver.couples += parseInt(t.booking_details.silver.couples) || 0;
+          statsObj.Silver.adults += parseInt(t.booking_details.silver.adult) || 0;
+          statsObj.Silver.couples += parseInt(t.booking_details.silver.couples) || 0;
         }
         if (t.booking_details.gold) {
-          categoryStats.Gold.adults += parseInt(t.booking_details.gold.adult) || 0;
-          categoryStats.Gold.couples += parseInt(t.booking_details.gold.couples) || 0;
+          statsObj.Gold.adults += parseInt(t.booking_details.gold.adult) || 0;
+          statsObj.Gold.couples += parseInt(t.booking_details.gold.couples) || 0;
         }
         if (t.booking_details.family) {
-          categoryStats.Family.pass += parseInt(t.booking_details.family.pass) || 0;
+          statsObj.Family.pass += parseInt(t.booking_details.family.pass) || 0;
         }
       } else {
-        // Fallback for legacy records before booking_details existed
-        const cat = t.category || 'General';
-        // Check if cat is purely 'General', 'Silver', or 'Gold'
-        if (categoryStats[cat]) {
-          categoryStats[cat].adults += (t.adult_count || 0);
-          categoryStats[cat].couples += (t.couples_count || 0);
+        // Fallback for older offline tickets that just use adult_count/couples_count and category string
+        const statsObj = isOffline ? offlineCategoryStats : onlineCategoryStats;
+        if (t.category === 'Silver') {
+          statsObj.Silver.adults += parseInt(t.adult_count) || 0;
+          statsObj.Silver.couples += parseInt(t.couples_count) || 0;
+        } else if (t.category === 'Gold') {
+          statsObj.Gold.adults += parseInt(t.adult_count) || 0;
+          statsObj.Gold.couples += parseInt(t.couples_count) || 0;
+        } else if (t.category === 'Family') {
+          statsObj.Family.pass += parseInt(t.ticket_count) || 0;
+        } else {
+          statsObj.General.adults += parseInt(t.adult_count) || 0;
+          statsObj.General.couples += parseInt(t.couples_count) || 0;
         }
       }
       
@@ -205,7 +219,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         offlineCount,
         onlineRevenue,
         offlineRevenue,
-        categoryStats
+        onlineCategoryStats,
+        offlineCategoryStats
       },
       recentBookings: recent || []
     });
