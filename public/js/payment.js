@@ -45,10 +45,23 @@ const openUpiModal = (amount) => {
 upiDownloadBtn?.addEventListener('click', () => {
   const canvas = upiQrcodeDiv.querySelector('canvas');
   if (canvas) {
-    const dataUrl = canvas.toDataURL('image/png');
+    const padding = 20;
+    const newCanvas = document.createElement('canvas');
+    newCanvas.width = canvas.width + (padding * 2);
+    newCanvas.height = canvas.height + (padding * 2);
+    const ctx = newCanvas.getContext('2d');
+    
+    // Fill white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+    
+    // Draw original QR code in the center
+    ctx.drawImage(canvas, padding, padding);
+
+    const dataUrl = newCanvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = 'CrownBeatz-QR-Code.png';
+    a.download = 'CrownBeatz-Payment-QR.png';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
