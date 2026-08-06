@@ -126,12 +126,15 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     (sumData || []).forEach(t => {
       if (t.payment === 'Rejected') return;
       
-      const ticketsCount = t.ticket_count || 0;
       const amount = parseFloat(t.amount || 0);
+      const isOffline = t.email && t.email.toLowerCase().startsWith('offline');
+      
+      // Skip counting unsold offline tickets
+      if (isOffline && amount <= 0) return;
+
+      const ticketsCount = t.ticket_count || 0;
       totalTickets += ticketsCount;
       revenue += amount;
-      
-      const isOffline = t.email && t.email.toLowerCase().startsWith('offline');
       
       if (isOffline) {
         offlineCount += ticketsCount;

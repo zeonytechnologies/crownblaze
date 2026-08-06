@@ -7,7 +7,7 @@ router.get('/availability', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('tickets')
-      .select('booking_details, payment');
+      .select('booking_details, payment, email');
 
     if (error) {
       console.error('Error fetching tickets for availability:', error);
@@ -22,6 +22,9 @@ router.get('/availability', async (req, res) => {
     const validTickets = data.filter(t => t.payment !== 'Rejected');
 
     validTickets.forEach(t => {
+      const isOffline = t.email && t.email.toLowerCase().startsWith('offline');
+      if (isOffline) return; // Exclude offline tickets from online capacity display
+
       if (t.booking_details) {
         // Silver seats
         if (t.booking_details.silver) {
