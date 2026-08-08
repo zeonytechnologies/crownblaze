@@ -158,18 +158,18 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         const statsObj = isOffline ? offlineCategoryStats : onlineCategoryStats;
         if (t.booking_details.general) {
           statsObj.General.adults += parseInt(t.booking_details.general.adult) || 0;
-          statsObj.General.couples += parseInt(t.booking_details.general.couples) || 0;
+          statsObj.General.couples += parseInt(t.booking_details.general.couples) || 0; // Legacy support
         }
         if (t.booking_details.silver) {
           statsObj.Silver.adults += parseInt(t.booking_details.silver.adult) || 0;
-          statsObj.Silver.couples += parseInt(t.booking_details.silver.couples) || 0;
+          statsObj.Silver.couples += parseInt(t.booking_details.silver.couples) || 0; // Legacy support
         }
         if (t.booking_details.gold) {
-          statsObj.Gold.adults += parseInt(t.booking_details.gold.adult) || 0;
           statsObj.Gold.couples += parseInt(t.booking_details.gold.couples) || 0;
+          statsObj.Gold.adults += parseInt(t.booking_details.gold.adult) || 0; // Legacy support
         }
         if (t.booking_details.family) {
-          statsObj.Family.pass += parseInt(t.booking_details.family.pass) || 0;
+          statsObj.Family.pass += parseInt(t.booking_details.family.pass) || 0; // Legacy support
         }
       } else {
         // Fallback for older offline tickets that just use adult_count/couples_count and category string
@@ -255,27 +255,35 @@ router.get('/tickets', adminAuth, async (req, res) => {
     }
 
     // Handle Attendance Filter
-    if (attendance === 'true') {
-      query = query.eq('attendance', true);
-    } else if (attendance === 'false') {
-      query = query.eq('attendance', false);
+    if (attendance && attendance !== 'all') {
+      if (attendance === 'true') {
+        query = query.eq('attendance', true);
+      } else if (attendance === 'false') {
+        query = query.eq('attendance', false);
+      }
     }
     
     // Handle Category Filter
-    if (category) {
-      query = query.eq('category', category);
+    if (category && category !== 'all') {
+      if (category === 'General') {
+         query = query.or(`category.ilike.%General%,category.ilike.%Bronze%`);
+      } else {
+         query = query.ilike('category', `%${category}%`);
+      }
     }
 
     // Handle Type Filter
-    if (ticketType) {
+    if (ticketType && ticketType !== 'all') {
       query = query.eq('booking_details->>type', ticketType);
     }
 
     // Handle Status (Sold/Unsold)
-    if (status === 'sold') {
-      query = query.gt('amount', 0);
-    } else if (status === 'unsold') {
-      query = query.eq('amount', 0);
+    if (status && status !== 'all') {
+      if (status === 'sold') {
+        query = query.gt('amount', 0);
+      } else if (status === 'unsold') {
+        query = query.eq('amount', 0);
+      }
     }
 
     // Handle Date Filter

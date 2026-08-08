@@ -178,10 +178,6 @@
               <span class="detail-label">Quantity / Passes</span>
               <span class="detail-value" id="ticket-qty">Loading...</span>
             </div>
-            <div class="detail-item">
-              <span class="detail-label">Amount Paid</span>
-              <span class="detail-value" id="ticket-amount">Loading...</span>
-            </div>
           </div>
           
           <div class="qr-holder">
@@ -254,7 +250,6 @@
         if (ticket.child_count > 0) typesArray.push(`${ticket.child_count} Child`);
 
         document.getElementById('ticket-qty').innerText = typesArray.join(', ') || `${ticket.ticket_count} Person(s)`;
-        document.getElementById('ticket-amount').innerText = `₹${parseFloat(ticket.amount).toFixed(2)}`;
         document.getElementById('ticket-qr').src = ticket.qr_data;
 
       } catch (error) {

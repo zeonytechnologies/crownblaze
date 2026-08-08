@@ -117,28 +117,22 @@ const handleBookingSubmit = (e) => {
   
   let totalTickets = 0;
   let totalAmount = 0;
-  let totalAdultsCouples = 0;
-  let totalChildren = 0;
   
-  const cats = ['general', 'silver', 'gold', 'family'];
-  const types = ['couples', 'adult', 'child', 'pass'];
+  const cats = ['general', 'silver', 'gold'];
+  const types = ['adult', 'couples'];
   
   cats.forEach(cat => {
     types.forEach(type => {
-      const qty = window.ticketCounts[cat][type] || 0;
-      if (qty > 0) {
-        if (type === 'pass') {
-          totalTickets += qty * 6; // 6 entries per pass
-          totalAdultsCouples += qty * 6;
-        } else if (type === 'couples') {
-          totalTickets += qty * 2;
-          totalAdultsCouples += qty * 2;
-        } else {
-          totalTickets += qty;
-          if (type === 'child') totalChildren += qty;
-          else totalAdultsCouples += qty;
+      if (window.ticketCounts[cat][type] !== undefined) {
+        const qty = window.ticketCounts[cat][type] || 0;
+        if (qty > 0) {
+          if (type === 'couples') {
+            totalTickets += qty * 2; // Couples count as 2 scans
+          } else {
+            totalTickets += qty;
+          }
+          totalAmount += (window.ticketPrices[cat][type] * qty);
         }
-        totalAmount += (window.ticketPrices[cat][type] * qty);
       }
     });
   });
@@ -152,10 +146,6 @@ const handleBookingSubmit = (e) => {
 
   if (totalTickets === 0) {
     showToast('Please select at least one ticket.', 'error');
-    return;
-  }
-  if (totalChildren > 0 && totalAdultsCouples === 0) {
-    showToast('At least one Adult or Couples pass is required to book a Child pass.', 'error');
     return;
   }
   if (!name || !email || !phone) {

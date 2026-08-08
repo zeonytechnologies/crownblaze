@@ -1,56 +1,35 @@
 // Global State for Multi-Category Pricing
 window.ticketPrices = {
-  general: { couples: 599, adult: 349, child: 0, pass: 0 },
-  silver: { couples: 799, adult: 449, child: 0, pass: 0 },
-  gold: { couples: 1099, adult: 599, child: 0, pass: 0 },
-  family: { couples: 0, adult: 0, child: 0, pass: 2999 }
+  general: { adult: 400 },
+  silver: { adult: 500 },
+  gold: { couples: 1200 }
 };
 
 window.ticketCounts = {
-  general: { couples: 0, adult: 0, child: 0, pass: 0 },
-  silver: { couples: 0, adult: 0, child: 0, pass: 0 },
-  gold: { couples: 0, adult: 0, child: 0, pass: 0 },
-  family: { couples: 0, adult: 0, child: 0, pass: 0 }
+  general: { adult: 0 },
+  silver: { adult: 0 },
+  gold: { couples: 0 }
 };
 
 window.seatAvailability = {
   silver: 250,
-  gold: 250,
-  family: 15
+  gold: 250
 };
 
 window.updateQty = (category, type, delta) => {
   const currentTotal = 
-    window.ticketCounts.general.couples*2 + window.ticketCounts.general.adult + window.ticketCounts.general.child +
-    window.ticketCounts.silver.couples*2 + window.ticketCounts.silver.adult + window.ticketCounts.silver.child +
-    window.ticketCounts.gold.couples*2 + window.ticketCounts.gold.adult + window.ticketCounts.gold.child +
-    window.ticketCounts.family.pass*6;
+    window.ticketCounts.general.adult +
+    window.ticketCounts.silver.adult +
+    (window.ticketCounts.gold.couples * 2);
     
   if (delta > 0 && currentTotal >= 20) {
-    // Increased total limit to accommodate family passes (e.g., 2 family passes = 12 people)
     showToast('Maximum 20 people can be booked at a time.', 'error');
     return;
   }
-  
-  if (type === 'child' && delta > 0) {
-    const totalChildren = window.ticketCounts.general.child + window.ticketCounts.silver.child + window.ticketCounts.gold.child;
-    if (totalChildren >= 2) {
-      showToast('Maximum 2 children allowed per booking.', 'error');
-      return;
-    }
-  }
 
-  if (delta > 0 && (category === 'silver' || category === 'gold' || category === 'family')) {
-    let reqSeats = 1;
-    let currentCatSeats = 0;
-
-    if (category === 'silver' || category === 'gold') {
-      reqSeats = (type === 'couples' ? 2 : 1);
-      currentCatSeats = (window.ticketCounts[category].couples * 2) + window.ticketCounts[category].adult + window.ticketCounts[category].child;
-    } else if (category === 'family') {
-      reqSeats = 1;
-      currentCatSeats = window.ticketCounts.family.pass;
-    }
+  if (delta > 0 && (category === 'silver' || category === 'gold')) {
+    let reqSeats = (category === 'gold' && type === 'couples') ? 2 : 1;
+    let currentCatSeats = (category === 'gold') ? (window.ticketCounts.gold.couples * 2) : window.ticketCounts.silver.adult;
     
     if (currentCatSeats + reqSeats > window.seatAvailability[category]) {
       showToast(`Not enough ${category.charAt(0).toUpperCase() + category.slice(1)} Passes available! Only ${window.seatAvailability[category]} left.`, 'error');
@@ -71,31 +50,33 @@ const initPricingCalculator = () => {
     if (breakdownList) breakdownList.innerHTML = '';
     let hasItems = false;
 
-    const cats = ['general', 'silver', 'gold', 'family'];
-    const types = ['couples', 'adult', 'child', 'pass'];
+    const cats = ['general', 'silver', 'gold'];
+    const types = ['adult', 'couples'];
     
     cats.forEach(cat => {
       types.forEach(type => {
-        const qty = window.ticketCounts[cat][type];
-        // Update DOM labels
-        const el = document.getElementById(`qty-${cat}-${type}-val`);
-        if(el) el.innerText = qty;
+        if (window.ticketCounts[cat][type] !== undefined) {
+          const qty = window.ticketCounts[cat][type];
+          // Update DOM labels
+          const el = document.getElementById(`qty-${cat}-${type}-val`);
+          if(el) el.innerText = qty;
 
-        if (qty > 0) {
-          hasItems = true;
-          const price = window.ticketPrices[cat][type];
-          total += (price * qty);
-          
-          const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
-          const typeName = type.charAt(0).toUpperCase() + type.slice(1);
-          
-          if (breakdownList) {
-            const row = document.createElement('div');
-            row.style.display = 'flex';
-            row.style.justifyContent = 'space-between';
-            row.style.marginBottom = '6px';
-            row.innerHTML = `<span>${catName} ${typeName} (${price > 0 ? '₹'+price : 'Free'})</span> <span style="color:#fff;">x ${qty}</span>`;
-            breakdownList.appendChild(row);
+          if (qty > 0) {
+            hasItems = true;
+            const price = window.ticketPrices[cat][type];
+            total += (price * qty);
+            
+            const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
+            const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            if (breakdownList) {
+              const row = document.createElement('div');
+              row.style.display = 'flex';
+              row.style.justifyContent = 'space-between';
+              row.style.marginBottom = '6px';
+              row.innerHTML = `<span>${catName} ${typeName} (${price > 0 ? '₹'+price : 'Free'})</span> <span style="color:#fff;">x ${qty}</span>`;
+              breakdownList.appendChild(row);
+            }
           }
         }
       });

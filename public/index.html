@@ -78,23 +78,15 @@
 
             <div style="margin-bottom: 24px;">
               <!-- General Category -->
-              <div style="margin-bottom: 15px; border: 1px solid var(--glass-border); padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.02);">
-                <label style="display:block; font-size:1.1rem; margin-bottom:12px; color: #fff; font-weight:600;">General Pass</label>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <div>
-                    <div style="font-weight: 600;">Couples Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹599 per couple</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('general', 'couples', -1)">-</button>
-                    <span class="qty-value" id="qty-general-couples-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('general', 'couples', 1)">+</button>
-                  </div>
+              <div style="margin-bottom: 15px; border: 1px solid #cd7f32; padding: 16px; border-radius: 12px; background: rgba(205,127,50,0.05);">
+                <label style="display:block; font-size:1.1rem; margin-bottom:12px; color: #cd7f32; font-weight:600;">🥉 BRONZE / GENERAL PASS — STANDING</label>
+                <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 12px;">
+                  <span><i class="fa-solid fa-person-walking"></i> Standing & Dancing Area</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-weight: 600;">Adult Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹349 per person</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹400 per person</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('general', 'adult', -1)">-</button>
@@ -102,40 +94,22 @@
                     <button type="button" class="qty-btn" onclick="updateQty('general', 'adult', 1)">+</button>
                   </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('general', 'child', -1)">-</button>
-                    <span class="qty-value" id="qty-general-child-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('general', 'child', 1)">+</button>
-                  </div>
-                </div>
               </div>
 
               <!-- Silver Category -->
               <div style="margin-bottom: 15px; border: 1px solid silver; padding: 16px; border-radius: 12px; background: rgba(192,192,192,0.05);">
                 <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: silver; font-weight:600;">
-                  <span>Silver Pass</span>
+                  <span>🥈 SILVER PASS — SEATING</span>
                   <span id="silver-remaining-badge" style="font-size: 1.1rem; background: rgba(192,192,192,0.3); padding: 6px 12px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(192,192,192,0.5);"></span>
                 </label>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <div>
-                    <div style="font-weight: 600;">Couples Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹799 per couple</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('silver', 'couples', -1)">-</button>
-                    <span class="qty-value" id="qty-silver-couples-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('silver', 'couples', 1)">+</button>
-                  </div>
+                <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 12px;">
+                  <span><i class="fa-solid fa-chair"></i> Comfortable Seating</span><br/>
+                  <span><i class="fa-solid fa-music"></i> Access to Dancing Area</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-weight: 600;">Adult Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹449 per person</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹500 per person</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('silver', 'adult', -1)">-</button>
@@ -143,75 +117,27 @@
                     <button type="button" class="qty-btn" onclick="updateQty('silver', 'adult', 1)">+</button>
                   </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('silver', 'child', -1)">-</button>
-                    <span class="qty-value" id="qty-silver-child-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('silver', 'child', 1)">+</button>
-                  </div>
-                </div>
               </div>
 
               <!-- Gold Category -->
               <div style="border: 1px solid #ffd700; padding: 16px; border-radius: 12px; background: rgba(255,215,0,0.05);">
                 <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: #ffd700; font-weight:600;">
-                  <span>Gold Pass</span>
+                  <span>👑 GOLD PASS — SEATING</span>
                   <span id="gold-remaining-badge" style="font-size: 1.1rem; background: rgba(255,215,0,0.3); padding: 6px 12px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(255,215,0,0.5);"></span>
                 </label>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 12px;">
+                  <span><i class="fa-solid fa-crown"></i> Premium Seating</span><br/>
+                  <span><i class="fa-solid fa-music"></i> Access to Dancing Area</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
-                    <div style="font-weight: 600;">Couples Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹1099 per couple</div>
+                    <div style="font-weight: 600;">Couples / Family Pass</div>
+                    <div style="font-size: 0.8rem; color: #ffd700;">₹1200 (2 Members + 1 Kid FREE)</div>
                   </div>
                   <div class="quantity-control">
                     <button type="button" class="qty-btn" onclick="updateQty('gold', 'couples', -1)">-</button>
                     <span class="qty-value" id="qty-gold-couples-val">0</span>
                     <button type="button" class="qty-btn" onclick="updateQty('gold', 'couples', 1)">+</button>
-                  </div>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <div>
-                    <div style="font-weight: 600;">Adult Pass</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹599 per person</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('gold', 'adult', -1)">-</button>
-                    <span class="qty-value" id="qty-gold-adult-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('gold', 'adult', 1)">+</button>
-                  </div>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <div style="font-weight: 600;">Child Pass</div>
-                    <div style="font-size: 0.8rem; color: #00ff66;">Free (Under 12 age)</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('gold', 'child', -1)">-</button>
-                    <span class="qty-value" id="qty-gold-child-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('gold', 'child', 1)">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Family Category -->
-              <div style="margin-top: 15px; border: 1px solid #ff3366; padding: 16px; border-radius: 12px; background: rgba(255,51,102,0.05);">
-                <label style="display:flex; align-items: center; justify-content: space-between; font-size:1.1rem; margin-bottom:12px; color: #ff3366; font-weight:600;">
-                  <span>Family Pass</span>
-                  <span id="family-remaining-badge" style="font-size: 1.1rem; background: rgba(255,51,102,0.3); padding: 6px 12px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(255,51,102,0.5);"></span>
-                </label>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <div style="font-weight: 600;">Group Pass (Max 6 Persons)</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">₹2999 per pass</div>
-                  </div>
-                  <div class="quantity-control">
-                    <button type="button" class="qty-btn" onclick="updateQty('family', 'pass', -1)">-</button>
-                    <span class="qty-value" id="qty-family-pass-val">0</span>
-                    <button type="button" class="qty-btn" onclick="updateQty('family', 'pass', 1)">+</button>
                   </div>
                 </div>
               </div>
@@ -256,7 +182,7 @@
           </div>
 
           <!-- Event Passes inside right column -->
-          <div style="margin-top: 30px;">
+          <!-- <div style="margin-top: 30px;">
             <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--color-neon-blue);">Pass Perks</h3>
             
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid #ccc; text-align: center;">
@@ -265,7 +191,7 @@
                 <li style="margin-bottom: 6px;">Standing & Dancing Area</li>
                 <li>Free for Children under 12 age (Separate space for children)</li>
               </ul>
-            </div>
+            </div> 
 
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid silver; text-align: center;">
               <div style="font-weight: bold; color: silver; font-size: 1.1rem; margin-bottom: 10px;">Silver Pass</div>
@@ -293,7 +219,7 @@
                 <li>Access to all General & Common Areas</li>
               </ul>
             </div>
-          </div>
+          </div> -->
         </div>
 
       </div>

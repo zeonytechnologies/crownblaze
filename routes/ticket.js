@@ -16,7 +16,6 @@ router.get('/availability', async (req, res) => {
 
     let silverUsed = 0;
     let goldUsed = 0;
-    let familyUsed = 0;
 
     // Filter out tickets that are explicitly 'Rejected' by admin
     const validTickets = data.filter(t => t.payment !== 'Rejected');
@@ -28,38 +27,24 @@ router.get('/availability', async (req, res) => {
       if (t.booking_details) {
         // Silver seats
         if (t.booking_details.silver) {
-          const couples = parseInt(t.booking_details.silver.couples, 10) || 0;
-          const adult = parseInt(t.booking_details.silver.adult, 10) || 0;
-          const child = parseInt(t.booking_details.silver.child, 10) || 0;
-          silverUsed += (couples * 2) + adult + child;
+          silverUsed += parseInt(t.booking_details.silver.adult, 10) || 0;
         }
         
         // Gold seats
         if (t.booking_details.gold) {
-          const couples = parseInt(t.booking_details.gold.couples, 10) || 0;
-          const adult = parseInt(t.booking_details.gold.adult, 10) || 0;
-          const child = parseInt(t.booking_details.gold.child, 10) || 0;
-          goldUsed += (couples * 2) + adult + child;
-        }
-
-        // Family passes
-        if (t.booking_details.family) {
-          const pass = parseInt(t.booking_details.family.pass, 10) || 0;
-          familyUsed += pass;
+          goldUsed += (parseInt(t.booking_details.gold.couples, 10) || 0) * 2;
         }
       }
     });
 
     const maxSilver = 250;
     const maxGold = 250;
-    const maxFamily = 15;
 
     res.json({
       success: true,
       availability: {
         silver: Math.max(0, maxSilver - silverUsed),
-        gold: Math.max(0, maxGold - goldUsed),
-        family: Math.max(0, maxFamily - familyUsed)
+        gold: Math.max(0, maxGold - goldUsed)
       }
     });
 

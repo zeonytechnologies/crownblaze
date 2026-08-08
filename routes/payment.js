@@ -43,10 +43,9 @@ router.post('/submit-booking', async (req, res) => {
 
     // Calculate final stored amount server-side to prevent tampering
     const ticketPrices = {
-      general: { couples: 599, adult: 349, child: 0, pass: 0 },
-      silver: { couples: 799, adult: 449, child: 0, pass: 0 },
-      gold: { couples: 1099, adult: 599, child: 0, pass: 0 },
-      family: { couples: 0, adult: 0, child: 0, pass: 2999 }
+      general: { adult: 400 },
+      silver: { adult: 500 },
+      gold: { couples: 1200 }
     };
 
     let totalAmount = 0;
@@ -57,8 +56,8 @@ router.post('/submit-booking', async (req, res) => {
     
     let categoryParts = [];
 
-    const cats = ['general', 'silver', 'gold', 'family'];
-    const types = ['couples', 'adult', 'child', 'pass'];
+    const cats = ['general', 'silver', 'gold'];
+    const types = ['adult', 'couples'];
     
     cats.forEach(cat => {
       let catDesc = [];
@@ -71,13 +70,9 @@ router.post('/submit-booking', async (req, res) => {
           if (type === 'couples') {
             totalTicketsNum += qty * 2;
             globalCouples += qty;
-          } else if (type === 'pass') {
-            totalTicketsNum += qty * 6; // 1 Family Pass = 6 people
-            globalAdult += qty * 6; // Map to adult so the scanner permits 6 general check-ins
           } else {
             totalTicketsNum += qty;
-            if (type === 'adult') globalAdult += qty;
-            if (type === 'child') globalChild += qty;
+            globalAdult += qty;
           }
           
           catDesc.push(`${qty} ${type.charAt(0).toUpperCase() + type.slice(1)}`);
@@ -94,42 +89,35 @@ router.post('/submit-booking', async (req, res) => {
     let requestedGeneral = 0;
     let requestedSilver = 0;
     let requestedGold = 0;
-    let requestedFamily = 0;
     
     if (ticketCounts.general) {
-      requestedGeneral = (parseInt(ticketCounts.general.couples)||0)*2 + (parseInt(ticketCounts.general.adult)||0) + (parseInt(ticketCounts.general.child)||0);
+      requestedGeneral = parseInt(ticketCounts.general.adult) || 0;
     }
     if (ticketCounts.silver) {
-      requestedSilver = (parseInt(ticketCounts.silver.couples)||0)*2 + (parseInt(ticketCounts.silver.adult)||0) + (parseInt(ticketCounts.silver.child)||0);
+      requestedSilver = parseInt(ticketCounts.silver.adult) || 0;
     }
     if (ticketCounts.gold) {
-      requestedGold = (parseInt(ticketCounts.gold.couples)||0)*2 + (parseInt(ticketCounts.gold.adult)||0) + (parseInt(ticketCounts.gold.child)||0);
-    }
-    if (ticketCounts.family) {
-      requestedFamily = parseInt(ticketCounts.family.pass)||0;
+      requestedGold = (parseInt(ticketCounts.gold.couples) || 0) * 2;
     }
 
-    if (requestedGeneral > 0 || requestedSilver > 0 || requestedGold > 0 || requestedFamily > 0) {
+    if (requestedGeneral > 0 || requestedSilver > 0 || requestedGold > 0) {
       const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment');
       const validTickets = (currentTickets || []).filter(t => t.payment !== 'Rejected');
       
       let generalUsed = 0;
       let silverUsed = 0;
       let goldUsed = 0;
-      let familyUsed = 0;
+      
       validTickets.forEach(t => {
         if (t.booking_details) {
           if (t.booking_details.general) {
-             generalUsed += (parseInt(t.booking_details.general.couples)||0)*2 + (parseInt(t.booking_details.general.adult)||0) + (parseInt(t.booking_details.general.child)||0);
+             generalUsed += parseInt(t.booking_details.general.adult) || 0;
           }
           if (t.booking_details.silver) {
-             silverUsed += (parseInt(t.booking_details.silver.couples)||0)*2 + (parseInt(t.booking_details.silver.adult)||0) + (parseInt(t.booking_details.silver.child)||0);
+             silverUsed += parseInt(t.booking_details.silver.adult) || 0;
           }
           if (t.booking_details.gold) {
-             goldUsed += (parseInt(t.booking_details.gold.couples)||0)*2 + (parseInt(t.booking_details.gold.adult)||0) + (parseInt(t.booking_details.gold.child)||0);
-          }
-          if (t.booking_details.family) {
-             familyUsed += parseInt(t.booking_details.family.pass)||0;
+             goldUsed += (parseInt(t.booking_details.gold.couples) || 0) * 2;
           }
         }
       });
@@ -142,9 +130,6 @@ router.post('/submit-booking', async (req, res) => {
       }
       if (requestedGold > (250 - goldUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only ${Math.max(0, 250 - goldUsed)} left.` });
-      }
-      if (requestedFamily > (15 - familyUsed)) {
-         return res.status(400).json({ success: false, error: `Not enough Family Passes available. Only ${Math.max(0, 15 - familyUsed)} left.` });
       }
     }
 

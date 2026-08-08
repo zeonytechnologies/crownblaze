@@ -168,27 +168,15 @@ const loadDashboardStats = async () => {
       const onlineCats = data.stats.onlineCategoryStats;
       if (onlineCats) {
         document.getElementById('online-cat-gen-adult').innerText = onlineCats.General.adults;
-        document.getElementById('online-cat-gen-couple').innerText = onlineCats.General.couples;
         document.getElementById('online-cat-sil-adult').innerText = onlineCats.Silver.adults;
-        document.getElementById('online-cat-sil-couple').innerText = onlineCats.Silver.couples;
-        document.getElementById('online-cat-gol-adult').innerText = onlineCats.Gold.adults;
         document.getElementById('online-cat-gol-couple').innerText = onlineCats.Gold.couples;
-        if (onlineCats.Family && document.getElementById('online-cat-fam-pass')) {
-          document.getElementById('online-cat-fam-pass').innerText = onlineCats.Family.pass;
-        }
       }
 
       const offlineCats = data.stats.offlineCategoryStats;
       if (offlineCats) {
         document.getElementById('offline-cat-gen-adult').innerText = offlineCats.General.adults;
-        document.getElementById('offline-cat-gen-couple').innerText = offlineCats.General.couples;
         document.getElementById('offline-cat-sil-adult').innerText = offlineCats.Silver.adults;
-        document.getElementById('offline-cat-sil-couple').innerText = offlineCats.Silver.couples;
-        document.getElementById('offline-cat-gol-adult').innerText = offlineCats.Gold.adults;
         document.getElementById('offline-cat-gol-couple').innerText = offlineCats.Gold.couples;
-        if (offlineCats.Family && document.getElementById('offline-cat-fam-pass')) {
-          document.getElementById('offline-cat-fam-pass').innerText = offlineCats.Family.pass;
-        }
       }
     } else {
       if (response.status === 401) handleSessionExpired();
@@ -268,7 +256,7 @@ const renderTicketsTable = (tickets) => {
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${ticket.ticket_id}</td>
         <td>${ticket.booked_at ? new Date(ticket.booked_at).toLocaleDateString() : '-'}</td>
         <td style="font-size: 0.75rem; color: var(--color-text-secondary); word-break: break-all; max-width: 100px;">${ticket.payment_id || '-'}</td>
-        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${ticket.category || 'General'}</span></td>
+        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${ticket.category === 'General' ? 'Bronze Pass' : (ticket.category || 'Bronze Pass')}</span></td>
         <td>
           <div style="font-weight: 600;">${ticket.name}</div>
           <div style="font-size:0.8rem; color: var(--color-text-secondary);">${ticket.email}</div>
@@ -317,7 +305,7 @@ const renderOfflineTicketsTable = (tickets) => {
         <td style="font-family: var(--font-title); font-weight: bold; color: var(--color-neon-blue);">${t.ticket_id}</td>
         <td>${t.booked_at ? new Date(t.booked_at).toLocaleDateString() : '-'}</td>
         <td style="font-size: 0.75rem; color: var(--color-text-secondary);">${t.order_id || '-'}</td>
-        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${t.category}</span></td>
+        <td><span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">${t.category === 'General' ? 'Bronze Pass' : (t.category || 'Bronze Pass')}</span></td>
         <td>${typeLabel}</td>
         <td style="font-weight: 600;">${t.ticket_count}</td>
         <td><span class="${statusClass}">${statusText}</span></td>

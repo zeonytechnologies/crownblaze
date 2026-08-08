@@ -91,52 +91,38 @@
       
       <!-- Online Category Breakdown -->
       <div class="glass-card" style="margin-bottom: 40px; padding: 20px;">
-        <h3 style="margin-bottom: 15px; color: var(--color-neon-blue);">Online Category Breakdown (Adults / Couples)</h3>
+        <h3 style="margin-bottom: 15px; color: var(--color-neon-blue);">Online Category Breakdown</h3>
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-            <h4 style="color: #fff; margin-bottom: 10px;">General</h4>
+            <h4 style="color: #cd7f32; margin-bottom: 10px;">Bronze</h4>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="online-cat-gen-adult" style="color:#fff;">0</strong></p>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="online-cat-gen-couple" style="color:#fff;">0</strong></p>
           </div>
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #c0c0c0;">
             <h4 style="color: #c0c0c0; margin-bottom: 10px;">Silver</h4>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="online-cat-sil-adult" style="color:#fff;">0</strong></p>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="online-cat-sil-couple" style="color:#fff;">0</strong></p>
           </div>
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #ffd700;">
             <h4 style="color: #ffd700; margin-bottom: 10px;">Gold</h4>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="online-cat-gol-adult" style="color:#fff;">0</strong></p>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="online-cat-gol-couple" style="color:#fff;">0</strong></p>
-          </div>
-          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #ff3366;">
-            <h4 style="color: #ff3366; margin-bottom: 10px;">Family</h4>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Passes: <strong id="online-cat-fam-pass" style="color:#fff;">0</strong></p>
           </div>
         </div>
       </div>
 
       <!-- Offline Category Breakdown -->
       <div class="glass-card" style="margin-bottom: 40px; padding: 20px;">
-        <h3 style="margin-bottom: 15px; color: #ff3366;">Offline Category Breakdown (Adults / Couples)</h3>
+        <h3 style="margin-bottom: 15px; color: #ff3366;">Offline Category Breakdown</h3>
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-            <h4 style="color: #fff; margin-bottom: 10px;">General</h4>
+            <h4 style="color: #cd7f32; margin-bottom: 10px;">Bronze</h4>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="offline-cat-gen-adult" style="color:#fff;">0</strong></p>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="offline-cat-gen-couple" style="color:#fff;">0</strong></p>
           </div>
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #c0c0c0;">
             <h4 style="color: #c0c0c0; margin-bottom: 10px;">Silver</h4>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="offline-cat-sil-adult" style="color:#fff;">0</strong></p>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="offline-cat-sil-couple" style="color:#fff;">0</strong></p>
           </div>
           <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #ffd700;">
             <h4 style="color: #ffd700; margin-bottom: 10px;">Gold</h4>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Adults: <strong id="offline-cat-gol-adult" style="color:#fff;">0</strong></p>
             <p style="color: var(--color-text-secondary); margin: 5px 0;">Couples: <strong id="offline-cat-gol-couple" style="color:#fff;">0</strong></p>
-          </div>
-          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #ff3366;">
-            <h4 style="color: #ff3366; margin-bottom: 10px;">Family</h4>
-            <p style="color: var(--color-text-secondary); margin: 5px 0;">Passes: <strong id="offline-cat-fam-pass" style="color:#fff;">0</strong></p>
           </div>
         </div>
       </div>
@@ -150,11 +136,9 @@
           <div style="flex: 1; min-width: 200px;">
             <label style="color: silver; display: block; margin-bottom: 8px;">Ticket Category</label>
             <select id="bulk-category" class="input-field" style="background: rgba(0,0,0,0.5); width: 100%; height: 48px; color: #fff; border: 1px solid var(--glass-border); padding: 0 12px; border-radius: 8px; font-size: 1rem;">
-              <option value="General" style="color: #000;">General Admission</option>
+              <option value="General" style="color: #000;">Bronze Pass</option>
               <option value="Silver" style="color: #000;">Silver Pass</option>
               <option value="Gold" style="color: #000;">Gold Pass</option>
-              <option value="VIP" style="color: #000;">VIP Pass</option>
-              <option value="Family" style="color: #000;">Family Pass</option>
             </select>
           </div>
           <div style="flex: 1; min-width: 150px;">
@@ -193,17 +177,14 @@
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="filter-category" class="filter-select">
               <option value="all">All Categories</option>
-              <option value="General">General</option>
+              <option value="General">Bronze Pass</option>
               <option value="Silver">Silver</option>
               <option value="Gold">Gold</option>
-              <option value="VIP">VIP</option>
-              <option value="Family">Family</option>
             </select>
             <select id="filter-type" class="filter-select">
               <option value="all">All Types</option>
               <option value="Adult">Adult</option>
               <option value="Couple">Couple</option>
-              <option value="Family Pass">Family Pass</option>
             </select>
             <select id="filter-status" class="filter-select">
               <option value="all">All Status (Sold/Unsold)</option>
@@ -252,15 +233,13 @@
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
               <span style="font-size: 0.9rem; color: #fff; font-weight: 600;">Auto-Select Unsold:</span>
               <select id="auto-select-category" class="filter-select" style="height: 36px; padding: 0 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; border-radius: 6px;">
-                <option value="General">General</option>
+                <option value="General">Bronze Pass</option>
                 <option value="Silver">Silver</option>
                 <option value="Gold">Gold</option>
-                <option value="Family">Family</option>
               </select>
               <select id="auto-select-type" class="filter-select" style="height: 36px; padding: 0 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; border-radius: 6px;">
                 <option value="Adult">Adult</option>
                 <option value="Couple">Couple</option>
-                <option value="Family Pass">Family Pass</option>
               </select>
               <input type="number" id="auto-select-count" class="form-control" style="width: 80px; height: 36px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; padding: 0 10px; border-radius: 6px;" placeholder="Qty" min="1">
               <button id="btn-auto-select" class="btn-glow" style="padding: 6px 12px; height: 36px; font-size: 0.85rem;"><i class="fa-solid fa-check-double"></i> Select</button>
