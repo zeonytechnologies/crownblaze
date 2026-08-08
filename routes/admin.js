@@ -225,7 +225,8 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         onlineRevenue,
         offlineRevenue,
         onlineCategoryStats,
-        offlineCategoryStats
+        offlineCategoryStats,
+        viewersCount: req.app.locals.viewersCount || 0
       },
       recentBookings: recent || []
     });

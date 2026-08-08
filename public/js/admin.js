@@ -146,6 +146,9 @@ const loadDashboardStats = async () => {
       statToday.innerText = data.stats.todayBookings;
       statRevenue.innerText = parseFloat(data.stats.revenue).toFixed(2);
       
+      const statViewers = document.getElementById('stat-viewers');
+      if (statViewers) statViewers.innerText = data.stats.viewersCount || 0;
+      
       const statVerifiedCount = document.getElementById('stat-verified-count');
       const statVerifiedRev = document.getElementById('stat-verified-revenue');
       const statPendingCount = document.getElementById('stat-pending-count');

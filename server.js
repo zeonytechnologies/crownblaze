@@ -39,8 +39,34 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-// Serve static files from /public
-app.use(express.static(path.join(__dirname, 'public')));
+const fs = require('fs');
+
+// Initialize viewers counter
+const viewersFile = path.join(__dirname, 'viewers.json');
+let viewersCount = 0;
+if (fs.existsSync(viewersFile)) {
+  try { viewersCount = JSON.parse(fs.readFileSync(viewersFile, 'utf8')).count || 0; } catch (e) {}
+}
+app.locals.viewersCount = viewersCount;
+app.locals.viewersFile = viewersFile;
+
+// Track visits to landing page
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path === '/index.html') {
+    req.app.locals.viewersCount++;
+    fs.writeFile(req.app.locals.viewersFile, JSON.stringify({count: req.app.locals.viewersCount}), () => {});
+  }
+  next();
+});
+
+// Serve static files from /public with caching for heavy assets
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: function (res, pathStr) {
+    if (pathStr.endsWith('.mp4') || pathStr.endsWith('.jpg') || pathStr.endsWith('.png') || pathStr.endsWith('.webp')) {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache media for 1 day to save bandwidth
+    }
+  }
+}));
 
 // Import Route Handlers
 const paymentRoutes = require('./routes/payment');
