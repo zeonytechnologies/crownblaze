@@ -43,9 +43,9 @@ router.post('/submit-booking', async (req, res) => {
 
     // Calculate final stored amount server-side to prevent tampering
     const ticketPrices = {
-      general: { adult: 349 },
-      silver: { adult: 500 },
-      gold: { couples: 1200 }
+      general: { adult: 300, couples: 600 },
+      silver: { adult: 400, couples: 800 },
+      gold: { adult: 600, couples: 1200 }
     };
 
     let totalAmount = 0;
@@ -90,15 +90,14 @@ router.post('/submit-booking', async (req, res) => {
     let requestedSilver = 0;
     let requestedGold = 0;
     
-    if (ticketCounts.general) {
-      requestedGeneral = parseInt(ticketCounts.general.adult) || 0;
-    }
-    if (ticketCounts.silver) {
-      requestedSilver = parseInt(ticketCounts.silver.adult) || 0;
-    }
-    if (ticketCounts.gold) {
-      requestedGold = (parseInt(ticketCounts.gold.couples) || 0) * 2;
-    }
+    ['general', 'silver', 'gold'].forEach(cat => {
+      if (ticketCounts[cat]) {
+        let req = (parseInt(ticketCounts[cat].adult) || 0) + ((parseInt(ticketCounts[cat].couples) || 0) * 2);
+        if (cat === 'general') requestedGeneral = req;
+        if (cat === 'silver') requestedSilver = req;
+        if (cat === 'gold') requestedGold = req;
+      }
+    });
 
     if (requestedGeneral > 0 || requestedSilver > 0 || requestedGold > 0) {
       const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment');
@@ -111,13 +110,13 @@ router.post('/submit-booking', async (req, res) => {
       validTickets.forEach(t => {
         if (t.booking_details) {
           if (t.booking_details.general) {
-             generalUsed += parseInt(t.booking_details.general.adult) || 0;
+             generalUsed += (parseInt(t.booking_details.general.adult) || 0) + ((parseInt(t.booking_details.general.couples) || 0) * 2);
           }
           if (t.booking_details.silver) {
-             silverUsed += parseInt(t.booking_details.silver.adult) || 0;
+             silverUsed += (parseInt(t.booking_details.silver.adult) || 0) + ((parseInt(t.booking_details.silver.couples) || 0) * 2);
           }
           if (t.booking_details.gold) {
-             goldUsed += (parseInt(t.booking_details.gold.couples) || 0) * 2;
+             goldUsed += (parseInt(t.booking_details.gold.adult) || 0) + ((parseInt(t.booking_details.gold.couples) || 0) * 2);
           }
         }
       });

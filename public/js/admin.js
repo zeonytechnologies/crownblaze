@@ -171,14 +171,20 @@ const loadDashboardStats = async () => {
       const onlineCats = data.stats.onlineCategoryStats;
       if (onlineCats) {
         document.getElementById('online-cat-gen-adult').innerText = onlineCats.General.adults;
+        document.getElementById('online-cat-gen-couple').innerText = onlineCats.General.couples;
         document.getElementById('online-cat-sil-adult').innerText = onlineCats.Silver.adults;
+        document.getElementById('online-cat-sil-couple').innerText = onlineCats.Silver.couples;
+        document.getElementById('online-cat-gol-adult').innerText = onlineCats.Gold.adults;
         document.getElementById('online-cat-gol-couple').innerText = onlineCats.Gold.couples;
       }
 
       const offlineCats = data.stats.offlineCategoryStats;
       if (offlineCats) {
         document.getElementById('offline-cat-gen-adult').innerText = offlineCats.General.adults;
+        document.getElementById('offline-cat-gen-couple').innerText = offlineCats.General.couples;
         document.getElementById('offline-cat-sil-adult').innerText = offlineCats.Silver.adults;
+        document.getElementById('offline-cat-sil-couple').innerText = offlineCats.Silver.couples;
+        document.getElementById('offline-cat-gol-adult').innerText = offlineCats.Gold.adults;
         document.getElementById('offline-cat-gol-couple').innerText = offlineCats.Gold.couples;
       }
     } else {

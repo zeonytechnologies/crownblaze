@@ -1,14 +1,14 @@
 // Global State for Multi-Category Pricing
 window.ticketPrices = {
-  general: { adult: 349 },
-  silver: { adult: 500 },
-  gold: { couples: 1200 }
+  general: { adult: 300, couples: 600 },
+  silver: { adult: 400, couples: 800 },
+  gold: { adult: 600, couples: 1200 }
 };
 
 window.ticketCounts = {
-  general: { adult: 0 },
-  silver: { adult: 0 },
-  gold: { couples: 0 }
+  general: { adult: 0, couples: 0 },
+  silver: { adult: 0, couples: 0 },
+  gold: { adult: 0, couples: 0 }
 };
 
 window.seatAvailability = {
@@ -17,19 +17,20 @@ window.seatAvailability = {
 };
 
 window.updateQty = (category, type, delta) => {
-  const currentTotal = 
-    window.ticketCounts.general.adult +
-    window.ticketCounts.silver.adult +
-    (window.ticketCounts.gold.couples * 2);
+  let currentTotal = 0;
+  ['general', 'silver', 'gold'].forEach(cat => {
+    currentTotal += window.ticketCounts[cat].adult;
+    currentTotal += (window.ticketCounts[cat].couples * 2);
+  });
     
-  if (delta > 0 && currentTotal >= 20) {
+  if (delta > 0 && currentTotal + (type === 'couples' ? 2 : 1) > 20) {
     showToast('Maximum 20 people can be booked at a time.', 'error');
     return;
   }
 
   if (delta > 0 && (category === 'silver' || category === 'gold')) {
-    let reqSeats = (category === 'gold' && type === 'couples') ? 2 : 1;
-    let currentCatSeats = (category === 'gold') ? (window.ticketCounts.gold.couples * 2) : window.ticketCounts.silver.adult;
+    let reqSeats = (type === 'couples') ? 2 : 1;
+    let currentCatSeats = window.ticketCounts[category].adult + (window.ticketCounts[category].couples * 2);
     
     if (currentCatSeats + reqSeats > window.seatAvailability[category]) {
       showToast(`Not enough ${category.charAt(0).toUpperCase() + category.slice(1)} Passes available! Only ${window.seatAvailability[category]} left.`, 'error');
