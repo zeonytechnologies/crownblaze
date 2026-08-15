@@ -124,13 +124,13 @@ router.post('/submit-booking', async (req, res) => {
         }
       });
       
-      if (requestedGeneral > (2500 - generalUsed)) {
+      if (requestedGeneral > 0 && requestedGeneral > (2500 - generalUsed)) {
          return res.status(400).json({ success: false, error: `Not enough General seats available. Only ${Math.max(0, 2500 - generalUsed)} left.` });
       }
-      if (requestedSilver > (36 - silverUsed)) {
+      if (requestedSilver > 0 && requestedSilver > (36 - silverUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only ${Math.max(0, 36 - silverUsed)} left.` });
       }
-      if (requestedGold > (0 - goldUsed)) {
+      if (requestedGold > 0 && requestedGold > (0 - goldUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only 0 left.` });
       }
     }
