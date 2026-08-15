@@ -33,7 +33,7 @@ const sendTicketEmail = (ticketData) => {
           
           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #333;">
             <h3 style="margin-top: 0; color: #aa00ff;">Event Schedule</h3>
-            <p style="margin: 5px 0; color: #ccc;">📅 <strong>Date:</strong> August 1st Week</p>
+            <p style="margin: 5px 0; color: #ccc;">📅 <strong>Date:</strong> August 15</p>
             <p style="margin: 5px 0; color: #ccc;">⏰ <strong>Time:</strong> 06:30 PM onwards</p>
             <p style="margin: 5px 0; color: #ccc;">📍 <strong>Venue:</strong> Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri</p>
           </div>
@@ -60,7 +60,7 @@ const sendTicketEmail = (ticketData) => {
       </div>
     `;
 
-    const textContent = `Welcome, ${name}!\n\nThank you for securing your spot at the most anticipated event of the year. Your payment of ₹${amount} was successful.\n\nTicket ID: ${ticketId}\n\nEvent Schedule:\nDate: August 1st Week\nTime: 06:30 PM onwards\nVenue: Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri\n\nPlease retain this ticket and present the QR code at the entrance.`;
+    const textContent = `Welcome, ${name}!\n\nThank you for securing your spot at the most anticipated event of the year. Your payment of ₹${amount} was successful.\n\nTicket ID: ${ticketId}\n\nEvent Schedule:\nDate: August 15\nTime: 06:30 PM onwards\nVenue: Bangalore to Chennai Highway Near Murugan idli kadai, Krishnagiri\n\nPlease retain this ticket and present the QR code at the entrance.`;
 
     const payload = JSON.stringify({
       personalizations: [

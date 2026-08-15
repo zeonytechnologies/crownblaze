@@ -1,6 +1,6 @@
 // Global State for Multi-Category Pricing
 window.ticketPrices = {
-  general: { adult: 300, couples: 600 },
+  general: { adult: 350, couples: 700 },
   silver: { adult: 400, couples: 800 },
   gold: { adult: 600, couples: 1200 }
 };
