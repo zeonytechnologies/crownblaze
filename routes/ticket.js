@@ -43,8 +43,8 @@ router.get('/availability', async (req, res) => {
     res.json({
       success: true,
       availability: {
-        silver: Math.max(0, maxSilver - silverUsed),
-        gold: Math.max(0, maxGold - goldUsed)
+        silver: 30,
+        gold: 0
       }
     });
 

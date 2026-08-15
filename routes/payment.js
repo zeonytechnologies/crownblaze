@@ -124,11 +124,11 @@ router.post('/submit-booking', async (req, res) => {
       if (requestedGeneral > (2500 - generalUsed)) {
          return res.status(400).json({ success: false, error: `Not enough General seats available. Only ${Math.max(0, 2500 - generalUsed)} left.` });
       }
-      if (requestedSilver > (250 - silverUsed)) {
-         return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only ${Math.max(0, 250 - silverUsed)} left.` });
+      if (requestedSilver > 30) {
+         return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only 30 left.` });
       }
-      if (requestedGold > (250 - goldUsed)) {
-         return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only ${Math.max(0, 250 - goldUsed)} left.` });
+      if (requestedGold > 0) {
+         return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only 0 left.` });
       }
     }
 

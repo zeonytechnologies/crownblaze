@@ -12,8 +12,8 @@ window.ticketCounts = {
 };
 
 window.seatAvailability = {
-  silver: 250,
-  gold: 250
+  silver: 30,
+  gold: 0
 };
 
 window.updateQty = (category, type, delta) => {
@@ -207,18 +207,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const response = await fetch('/api/ticket/availability');
     const data = await response.json();
-    if (data.success && data.availability) {
-      window.seatAvailability = data.availability;
-      
-      // Update UI badges
+    if (data.success) {
+      // Update UI badges manually to avoid overwriting the frontend limit
       const silverBadge = document.getElementById('silver-remaining-badge');
-      if (silverBadge) silverBadge.innerText = `${data.availability.silver} Seats Left`;
+      if (silverBadge) silverBadge.innerText = `30 Seats Left`;
       
       const goldBadge = document.getElementById('gold-remaining-badge');
-      if (goldBadge) goldBadge.innerText = `${data.availability.gold} Seats Left`;
+      if (goldBadge) {
+         goldBadge.innerText = `SOLD OUT`;
+         goldBadge.style.color = `#ff3366`;
+         goldBadge.style.borderColor = `#ff3366`;
+      }
 
       const familyBadge = document.getElementById('family-remaining-badge');
-      if (familyBadge) familyBadge.innerText = `${data.availability.family} Passes Left`;
+      if (familyBadge) familyBadge.innerText = `0 Passes Left`;
     }
   } catch (err) {
     console.error('Failed to fetch availability:', err);
