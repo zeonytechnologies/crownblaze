@@ -27,24 +27,24 @@ router.get('/availability', async (req, res) => {
       if (t.booking_details) {
         // Silver seats
         if (t.booking_details.silver) {
-          silverUsed += parseInt(t.booking_details.silver.adult, 10) || 0;
+          silverUsed += (parseInt(t.booking_details.silver.adult, 10) || 0) + ((parseInt(t.booking_details.silver.couples, 10) || 0) * 2);
         }
         
         // Gold seats
         if (t.booking_details.gold) {
-          goldUsed += (parseInt(t.booking_details.gold.couples, 10) || 0) * 2;
+          goldUsed += (parseInt(t.booking_details.gold.adult, 10) || 0) + ((parseInt(t.booking_details.gold.couples, 10) || 0) * 2);
         }
       }
     });
 
-    const maxSilver = 250;
-    const maxGold = 250;
+    const maxSilver = 36; // 6 currently used online + 30 new available
+    const maxGold = 0; // Hardcoded sold out
 
     res.json({
       success: true,
       availability: {
-        silver: 30,
-        gold: 0
+        silver: Math.max(0, maxSilver - silverUsed),
+        gold: Math.max(0, maxGold - goldUsed)
       }
     });
 

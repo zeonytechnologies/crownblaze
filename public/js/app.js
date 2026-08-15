@@ -207,10 +207,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const response = await fetch('/api/ticket/availability');
     const data = await response.json();
-    if (data.success) {
-      // Update UI badges manually to avoid overwriting the frontend limit
+    if (data.success && data.availability) {
+      window.seatAvailability = data.availability;
+      
       const silverBadge = document.getElementById('silver-remaining-badge');
-      if (silverBadge) silverBadge.innerText = `30 Seats Left`;
+      if (silverBadge) silverBadge.innerText = `${data.availability.silver} Seats Left`;
       
       const goldBadge = document.getElementById('gold-remaining-badge');
       if (goldBadge) {

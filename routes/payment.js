@@ -100,7 +100,7 @@ router.post('/submit-booking', async (req, res) => {
     });
 
     if (requestedGeneral > 0 || requestedSilver > 0 || requestedGold > 0) {
-      const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment');
+      const { data: currentTickets } = await supabase.from('tickets').select('booking_details, payment, email');
       const validTickets = (currentTickets || []).filter(t => t.payment !== 'Rejected');
       
       let generalUsed = 0;
@@ -108,6 +108,9 @@ router.post('/submit-booking', async (req, res) => {
       let goldUsed = 0;
       
       validTickets.forEach(t => {
+        const isOffline = t.email && t.email.toLowerCase().startsWith('offline');
+        if (isOffline) return;
+        
         if (t.booking_details) {
           if (t.booking_details.general) {
              generalUsed += (parseInt(t.booking_details.general.adult) || 0) + ((parseInt(t.booking_details.general.couples) || 0) * 2);
@@ -124,10 +127,10 @@ router.post('/submit-booking', async (req, res) => {
       if (requestedGeneral > (2500 - generalUsed)) {
          return res.status(400).json({ success: false, error: `Not enough General seats available. Only ${Math.max(0, 2500 - generalUsed)} left.` });
       }
-      if (requestedSilver > 30) {
-         return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only 30 left.` });
+      if (requestedSilver > (36 - silverUsed)) {
+         return res.status(400).json({ success: false, error: `Not enough Silver seats available. Only ${Math.max(0, 36 - silverUsed)} left.` });
       }
-      if (requestedGold > 0) {
+      if (requestedGold > (0 - goldUsed)) {
          return res.status(400).json({ success: false, error: `Not enough Gold seats available. Only 0 left.` });
       }
     }
